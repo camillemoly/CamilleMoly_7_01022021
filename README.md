@@ -7,7 +7,7 @@ Each `.env` file contain :
 * DB_`ENV`_PASSWORD
 * DB_`ENV`_HOST
 * DB_`ENV`_DIALEC
-* `ENV`_SECRET_KEY <br><br>
+* `ENV`_SECRET_KEY <br>
 <!-- end of the list -->
 `.env-test` also contains a `ENV`_USER_TOKEN that will be used to perform the tests.
 
