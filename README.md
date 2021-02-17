@@ -16,12 +16,11 @@ Each `.env` file contain :
 
 # To start the server
 Type `cd backend` to go to backend directory. Then type :
-* `npm test` or `npm run test` if you want to be in test environment
 * `npm run dev` if you want to be in dev environment
 * `npm run prod` if you want to be in prod environment
 
-# To start the tests
-After launching the test environment, type `npm run mocha` to start the tests. 
+# To launch the tests
+To launch the tests, type `npm test` or `npm run test` (from the backend directory again).
 
 # Documentation API
 You can consult API documentation just [here](https://documenter.getpostman.com/view/13743956/TWDTLyEE).
