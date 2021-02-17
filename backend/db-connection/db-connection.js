@@ -1,5 +1,5 @@
 const { Sequelize } = require("sequelize");
-require("dotenv").config();
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` }); //choose env file depending on the environment
 
 // DB connection
 const sequelize = new Sequelize(
@@ -12,9 +12,17 @@ const sequelize = new Sequelize(
     logging: false
   }
 );
-sequelize
-  .authenticate()
-  .then(() => console.log("Connection has been established successfully."))
+
+sequelize.authenticate()
+  .then(() => {
+    if (process.env.NODE_ENV == "test") {
+      console.log("Connection to groupomania_test has been established successfully.")
+    } else if (process.env.NODE_ENV == "dev") {
+      console.log("Connection to groupomania_dev has been established successfully.")
+    } else if (process.env.NODE_ENV == "prod") {
+      console.log("Connection to groupomania_prod has been established successfully.")
+    }
+  })
   .catch((error) => console.error("Unable to connect to the database:", error));
 
 module.exports = sequelize;
