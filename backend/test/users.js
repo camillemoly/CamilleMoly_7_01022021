@@ -2,6 +2,7 @@ var chai = require("chai");
 var chaiHttp = require("chai-http");
 var should = require("chai").should();
 var app = require("../app");
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` }); //choose env file depending on the environment
 
 chai.use(chaiHttp);
 
@@ -11,7 +12,8 @@ describe("GET /api/users/:id", () => {
   it("should find an user by his id", (done) => {
     chai
       .request(app)
-      .get("/api/users/50")
+      .get("/api/users/54")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -23,6 +25,7 @@ describe("GET /api/users/:id", () => {
     chai
       .request(app)
       .get("/api/users/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -41,13 +44,14 @@ describe("PUT /api/users/:id", () => {
     chai
       // add a id of user account existing before starting the test
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: "TestUn",
         last_name: "TestUn",
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -62,13 +66,14 @@ describe("PUT /api/users/:id", () => {
     chai
       // add a id of user account existing before starting the test
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: "TestDeux",
         last_name: "TestDeux",
         profile_picture: "",
         about: "Hello to everyone !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -89,6 +94,7 @@ describe("PUT /api/users/:id", () => {
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -102,12 +108,13 @@ describe("PUT /api/users/:id", () => {
   it("should generate an error because a mandatory field at least is empty", (done) => {
     chai
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: "",
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -121,13 +128,14 @@ describe("PUT /api/users/:id", () => {
   it("should generate an error because first_name and last_name fields must not contain only whitespaces", (done) => {
     chai
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: " ",
         last_name: "TestCinq",
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -143,13 +151,14 @@ describe("PUT /api/users/:id", () => {
   it("should generate an error because first_name and last_name fields must not contain numbers", (done) => {
     chai
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: "Test6",
         last_name: "TestSix",
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -165,13 +174,14 @@ describe("PUT /api/users/:id", () => {
   it("should generate an error because first_name and last_name fields must not contain symbols", (done) => {
     chai
       .request(app)
-      .put("/api/users/50")
+      .put("/api/users/54")
       .send({
         first_name: "TestSept!",
         last_name: "TestSept",
         profile_picture: "http://www.placeholder.com/placeholder-image.jpg",
         about: "Hello world !",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -193,6 +203,7 @@ describe("DELETE /api/users/:id", () => {
       // add a id of user account existing before starting the test
       .request(app)
       .delete("/api/users/47")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -205,6 +216,7 @@ describe("DELETE /api/users/:id", () => {
     chai
       .request(app)
       .delete("/api/users/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");

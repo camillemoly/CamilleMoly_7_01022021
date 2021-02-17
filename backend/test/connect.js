@@ -183,8 +183,8 @@ describe("POST /api/auth/login", () => {
       .request(app)
       .post("/api/auth/login")
       .send({
-        email: "camillemoly@test.com",
-        password: "Camille1996!",
+        email: "test@test.com",
+        password: "Testpassw0rd!",
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -217,8 +217,8 @@ describe("POST /api/auth/login", () => {
       .request(app)
       .post("/api/auth/login")
       .send({
-        email: "camillemoly@test.com",
-        password: "Camille1995!",
+        email: "test@test.com",
+        password: "Testpassw0000rd!",
       })
       .end((err, res) => {
         res.should.have.status(401);

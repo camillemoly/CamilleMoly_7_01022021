@@ -2,6 +2,7 @@ var chai = require("chai");
 var chaiHttp = require("chai-http");
 var should = require("chai").should();
 var app = require("../app");
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` }); //choose env file depending on the environment
 
 chai.use(chaiHttp);
 
@@ -12,6 +13,7 @@ describe("GET /api/posts/", () => {
     chai
       .request(app)
       .get("/api/posts")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("array");
@@ -23,6 +25,7 @@ describe("GET /api/posts/", () => {
     chai
       .request(app)
       .get("/api/posts")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -38,7 +41,8 @@ describe("GET /api/posts/:id", () => {
   it("should find one post by his id", (done) => {
     chai
       .request(app)
-      .get("/api/posts/5")
+      .get("/api/posts/32")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -49,13 +53,14 @@ describe("GET /api/posts/:id", () => {
   it.skip("should generate an error if the post with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .get("/api/posts/1")
+      .get("/api/posts/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
         res.body.should.have
           .property("error")
-          .eql("Le post recherché n'exite pas !");
+          .eql("Le post recherché n'existe pas !");
         done();
       });
   });
@@ -69,10 +74,11 @@ describe("POST /api/posts", () => {
       .request(app)
       .post("/api/posts")
       .send({
-        user_id: 50,
+        user_id: 54,
         content: "Hello world !",
-        post_picture: "",
+        post_picture: ""
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -86,29 +92,49 @@ describe("POST /api/posts", () => {
       .request(app)
       .post("/api/posts")
       .send({
-        user_id: 1,
+        user_id: 1996,
         content: "Hello world !",
-        post_picture: "",
+        post_picture: ""
       })
+      .set("authorization", `Bearer myTokenWhichNotExist`)
       .end((err, res) => {
-        res.should.have.status(404);
+        res.should.have.status(401);
         res.body.should.be.a("object");
-        res.body.should.have
-          .property("error")
-          .eql("Création de post impossible, cet utilisateur n'existe pas !");
+        res.body.should.have.property("error").eql("Requête invalide !");
         done();
       });
   });
   // 3
+  it("should generate an error because the user id and the token doesn't correspond", (done) => {
+    chai
+      .request(app)
+      .post("/api/posts")
+      .send({
+        user_id: 1996,
+        content: "Hello world !",
+        post_picture: ""
+      })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.a("object");
+        res.body.should.have
+          .property("error")
+          .eql("Identifiant d'utilisateur invalide !");
+        done();
+      });
+  });
+  // 4
   it("should generate an error because the post must have a content", (done) => {
     chai
       .request(app)
       .post("/api/posts")
       .send({
-        user_id: 50,
+        user_id: 54,
         content: "",
-        post_picture: "http://www.placeholder.com/image-placeholder.jpg",
+        post_picture: "http://www.placeholder.com/image-placeholder.jpg"
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -126,11 +152,12 @@ describe("PUT /api/posts/:id", () => {
   it("should modify a post by his id", (done) => {
     chai
       .request(app)
-      .put("/api/posts/5")
+      .put("/api/posts/32")
       .send({
         content: "Hello everybody !",
-        post_picture: "",
+        post_picture: ""
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -142,11 +169,12 @@ describe("PUT /api/posts/:id", () => {
   it("should generate an error because the post with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .put("/api/posts/1")
+      .put("/api/posts/1996")
       .send({
         content: "Hello everybody !",
-        post_picture: "",
+        post_picture: ""
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -160,12 +188,12 @@ describe("PUT /api/posts/:id", () => {
   it("should generate an error because the post must have a content", (done) => {
     chai
       .request(app)
-      .put("/api/posts/5")
+      .put("/api/posts/32")
       .send({
-        user_id: 50,
         content: "",
-        post_picture: "http://www.placeholder.com/image-placeholder.jpg",
+        post_picture: "http://www.placeholder.com/image-placeholder.jpg"
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -183,7 +211,8 @@ describe("DELETE /api/posts/:id", () => {
   it.skip("should delete a post by his id", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/5")
+      .delete("/api/posts/32")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -195,7 +224,8 @@ describe("DELETE /api/posts/:id", () => {
   it("should generate an error because the post with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/1")
+      .delete("/api/posts/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -213,11 +243,12 @@ describe("POST /api/posts/:id/likes", () => {
   it("should like a post", (done) => {
     chai
       .request(app)
-      .post("/api/posts/5/likes")
+      .post("/api/posts/32/likes")
       .send({
-        user_id: 50,
-        post_id: 5,
+        user_id: 54,
+        post_id: 32
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -229,29 +260,48 @@ describe("POST /api/posts/:id/likes", () => {
   it("should generate an error because the user account doesn't exist", (done) => {
     chai
       .request(app)
-      .post("/api/posts/5/likes")
+      .post("/api/posts/32/likes")
       .send({
-        user_id: 1,
-        post_id: 5,
+        user_id: 1996,
+        post_id: 32
       })
+      .set("authorization", `Bearer myTokenWhichNotExist`)
       .end((err, res) => {
-        res.should.have.status(404);
+        res.should.have.status(401);
         res.body.should.be.a("object");
-        res.body.should.have
-          .property("error")
-          .eql("Like impossible, cet utilisateur n'existe pas !");
+        res.body.should.have.property("error").eql("Requête invalide !");
         done();
       });
   });
   // 3
+  it("should generate an error because the user id and the token doesn't correspond", (done) => {
+    chai
+      .request(app)
+      .post("/api/posts/32/likes")
+      .send({
+        user_id: 1996,
+        post_id: 32
+      })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.a("object");
+        res.body.should.have
+          .property("error")
+          .eql("Identifiant d'utilisateur invalide !");
+        done();
+      });
+  });
+  // 4
   it("should generate an error because the post id doesn't exist", (done) => {
     chai
       .request(app)
-      .post("/api/posts/1/likes")
+      .post("/api/posts/1996/likes")
       .send({
-        user_id: 50,
-        post_id: 1,
+        user_id: 54,
+        post_id: 1996,
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -263,13 +313,14 @@ describe("POST /api/posts/:id/likes", () => {
   });
 });
 
-/************************************************** CANCEL LIKE POST **************************************************/
+/************************************************** UNLIKE POST **************************************************/
 describe("DELETE /api/posts/:id/likes/:id", () => {
   // 1
-  it.skip("should delete a like of a post", (done) => {
+  it.skip("should unlike a post", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/5/likes/2")
+      .delete("/api/posts/32/likes/32")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -281,7 +332,8 @@ describe("DELETE /api/posts/:id/likes/:id", () => {
   it("should generate an error because the like with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/5/likes/1996")
+      .delete("/api/posts/32/likes/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -299,12 +351,13 @@ describe("POST /api/posts/:id/comments", () => {
   it("should comment a post", (done) => {
     chai
       .request(app)
-      .post("/api/posts/5/comments")
+      .post("/api/posts/32/comments")
       .send({
-        user_id: 50,
-        post_id: 5,
+        user_id: 54,
+        post_id: 32,
         content: "Ahahah",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -316,33 +369,51 @@ describe("POST /api/posts/:id/comments", () => {
   it("should generate an error because the user account doesn't exist", (done) => {
     chai
       .request(app)
-      .post("/api/posts/5/comments")
+      .post("/api/posts/32/comments")
       .send({
-        user_id: 1,
-        post_id: 5,
+        user_id: 1996,
+        post_id: 32,
         content: "Ahahah",
       })
+      .set("authorization", `Bearer myTokenWhichNotExist`)
       .end((err, res) => {
-        res.should.have.status(404);
+        res.should.have.status(401);
         res.body.should.be.a("object");
-        res.body.should.have
-          .property("error")
-          .eql(
-            "Commentaire impossible à ajouter, cet utilisateur n'existe pas !"
-          );
+        res.body.should.have.property("error").eql("Requête invalide !");
         done();
       });
   });
   // 3
+  it("should generate an error because the user id and the token doesn't correspond", (done) => {
+    chai
+      .request(app)
+      .post("/api/posts/32/comments")
+      .send({
+        user_id: 1996,
+        post_id: 32,
+        content: "Ahahah",
+      })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.a("object");
+        res.body.should.have
+          .property("error")
+          .eql("Identifiant d'utilisateur invalide !");
+        done();
+      });
+  });
+  // 4
   it("should generate an error because the post id doesn't exist", (done) => {
     chai
       .request(app)
-      .post("/api/posts/1/comments")
+      .post("/api/posts/1996/comments")
       .send({
-        user_id: 50,
-        post_id: 1,
+        user_id: 54,
+        post_id: 1996,
         content: "Ahahah",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -352,16 +423,17 @@ describe("POST /api/posts/:id/comments", () => {
         done();
       });
   });
-  // 4
+  // 5
   it("should generate an error because a comment must not be empty", (done) => {
     chai
       .request(app)
-      .post("/api/posts/5/comments")
+      .post("/api/posts/32/comments")
       .send({
-        user_id: 50,
-        post_id: 5,
+        user_id: 54,
+        post_id: 32,
         content: "",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -379,11 +451,12 @@ describe("PUT /api/posts/:id/comments/:id", () => {
   it("should modify a comment by his id", (done) => {
     chai
       .request(app)
-      .put("/api/posts/5/comments/1")
+      .put("/api/posts/32/comments/26")
       .send({
         content: "Hello everybody !",
         post_picture: "",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a("object");
@@ -392,14 +465,15 @@ describe("PUT /api/posts/:id/comments/:id", () => {
       });
   });
   // 2
-  it("should generate an error because the post with this id doesn't exist", (done) => {
+  it("should generate an error because the comment with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .put("/api/posts/:id/comments/:id")
+      .put("/api/posts/32/comments/1996")
       .send({
         content: "Hello everybody !",
         post_picture: "",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
@@ -410,15 +484,15 @@ describe("PUT /api/posts/:id/comments/:id", () => {
       });
   });
   // 3
-  it("should generate an error because the post must have a content", (done) => {
+  it("should generate an error because the comment must have a content", (done) => {
     chai
       .request(app)
-      .put("/api/posts/5/comments/1")
+      .put("/api/posts/32/comments/26")
       .send({
-        user_id: 50,
         content: "",
         post_picture: "http://www.placeholder.com/image-placeholder.jpg",
       })
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(401);
         res.body.should.be.a("object");
@@ -436,7 +510,8 @@ describe("DELETE /api/posts/:id/comments/:id", () => {
   it.skip("should delete a comment by his id", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/5/comments/2")
+      .delete("/api/posts/32/comments/32")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -448,7 +523,8 @@ describe("DELETE /api/posts/:id/comments/:id", () => {
   it("should generate an error because the comment with this id doesn't exist", (done) => {
     chai
       .request(app)
-      .delete("/api/posts/5/comments/1996")
+      .delete("/api/posts/32/comments/1996")
+      .set("authorization", `Bearer ${process.env.USER_TOKEN}`)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a("object");
