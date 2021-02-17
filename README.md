@@ -8,6 +8,7 @@ Each `.env` file contain :
 * DB_`ENV`_HOST
 * DB_`ENV`_DIALEC
 * `ENV`_SECRET_KEY <br><br>
+<!-- end of the list -->
 `.env-test` also contains a `ENV`_USER_TOKEN that will be used to perform the tests.
 
 # To start the server
@@ -17,4 +18,4 @@ Type `cd backend` to go to backend directory. Then type :
 * `npm prod` if you're in prod environment
 
 # Documentation API
-You can consult API documentation just here --> https://documenter.getpostman.com/view/13743956/TWDTLyEE
+You can consult API documentation just [here](https://documenter.getpostman.com/view/13743956/TWDTLyEE).
