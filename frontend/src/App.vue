@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <!-- <div id="nav" v-if="['Home', 'About'].indexOf($route.name) > - 1"> PLACE NAVIAGTION HERE -->
     <router-view/>
   </div>
 </template>
@@ -10,6 +9,11 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  // text-align: center;
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  background-color: $color-primary;
+  color: white;
 }
 </style>
