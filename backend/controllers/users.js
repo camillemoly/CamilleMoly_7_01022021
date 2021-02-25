@@ -15,8 +15,11 @@ exports.getOneUser = (req, res, next) => {
         res.status(404).json({ error: "Aucun utilisateur ne correspond à cet identifiant !" });
       }
       const userFound = {
-        ...req.body // user_id, first_name, last_name
-      };
+        firstName: user.first_name,
+        lastName: user.last_name,
+        profilePicture: user.profile_picture,
+        about: user.about
+      }
       res.status(200).json(userFound);
     })
     .catch((error) => res.status(500).json({ error }));
