@@ -56,7 +56,9 @@ exports.signup = (req, res, next) => {
               email: String(req.body.email),
               password: String(hash),
               first_name: String(req.body.first_name),
-              last_name: String(req.body.last_name)
+              last_name: String(req.body.last_name),
+              profile_picture: String("http://127.0.0.1:5500/backend/images/default-profile-picture.jpg"),
+              about: String("")
             });
             res.status(201).json({ message: "Compte utilisateur créé !" });
           })
