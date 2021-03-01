@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-        <Authentication :form="form" :auth="login"/>
+        <Authentication :form="form" :info="$store.state.info" :auth="login"/>
     </div>
 </template>
 
@@ -16,7 +16,6 @@ export default {
     data(){
         return{
             form: {
-                info: null,
                 typeOfAuth: "Connexion",
                 authBtn: "Se connecter",
                 question: "Pas encore inscrit ?",
@@ -26,9 +25,6 @@ export default {
         }
     },
     methods: {
-        redirectToHome() {
-            setTimeout(() => this.$router.push({ name: "Home" }), 1500)
-        },
         login() {
             axios({
                 method: "post",
@@ -42,12 +38,12 @@ export default {
                 }
             })
             .then(response => { 
-                this.form.info = `${response.data.message} Redirection vers la page d'accueil...`
-                this.$store.state.token = response.data.token
-                this.$store.state.userId = response.data.user_id
-                this.redirectToHome()
+                this.$store.state.info = `${response.data.message} Redirection vers la page d'accueil...`
+                localStorage.setItem("userId", response.data.user_id)
+                localStorage.setItem("token", response.data.token)
+                setTimeout(() => this.$router.push({ name: "Home" }), 1500)
             })
-            .catch(error => { if(error.response) { this.form.info = error.response.data.error }});
+            .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
         }
     }
 }

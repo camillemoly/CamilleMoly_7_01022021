@@ -1,6 +1,6 @@
 <template>
     <div class="signup">
-        <Authentication :form="form" :auth="signup"/>
+        <Authentication :form="form" :info="$store.state.info" :auth="signup"/>
     </div>
 </template>
 
@@ -16,7 +16,6 @@ export default {
     data(){
         return{
             form: {
-                info: null,
                 typeOfAuth: "Inscription",
                 authBtn: "S'inscrire",
                 question: "Déjà un compte ?",
@@ -26,9 +25,6 @@ export default {
         }
     },
     methods: {
-        redirectToLogin() {
-            setTimeout(() => this.$router.push({ name: "Login" }), 2000)
-        },
         signup() {
             axios({
                 method: "post",
@@ -44,10 +40,10 @@ export default {
                 }
             })
             .then(response => { 
-                this.form.info = `${response.data.message} Redirection vers la page de connexion...`
-                this.redirectToLogin()
+                this.$store.state.info = `${response.data.message} Redirection vers la page de connexion...`
+                setTimeout(() => this.$router.push({ name: "Login" }), 1500)
             })
-            .catch(error => { if(error.response) { this.form.info = error.response.data.error }});
+            .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
         }
     }
 }
