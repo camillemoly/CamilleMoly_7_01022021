@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectRoutes = require("./routes/connect");
 const usersRoutes = require("./routes/users");
 const postsRoutes = require("./routes/posts");
+const path = require("path")
 
 // Create app
 const app = express();
@@ -26,6 +27,9 @@ app.use(cors(corsOptions));
 
 // Middleware to transform body requests received from frontend to JSON object
 app.use(bodyParser.json());
+
+// Get the img
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Routes
 app.use("/api/auth", connectRoutes);
