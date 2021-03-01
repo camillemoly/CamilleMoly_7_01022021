@@ -1,53 +1,50 @@
 <template>
-  <div class="home">
-    <Navigation></Navigation>
-    <div class="home__container">
-      <div class="publication">
-        <div class="publication__user">
-          <div class="publication__user__picture">
-            <img :src="$store.state.profilePicture">
+  <div :class="$style.home">
+    <Navigation/>
+    <div :class="$style.home__container">
+      <div :class="$style.publication">
+        <div :class="$style.publication__user">
+          <div :class="$style.publication__user__picture" class="img-container-rounded">
+            <img :src="profilePicture" class="img-cover">
           </div>
-          <input class="publication__user__input" placeholder="Que voulez-vous dire ?">
+          <textarea :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ firstName ]] + ', que voulez-vous dire ?'"></textarea>
         </div>
-        <div class="publication__buttons">
-          <button class="publication__buttons__addPicture">Ajouter une image</button>
-          <button class="publication__buttons__publish">Publier</button>
+        <div :class="$style.publication__buttons">
+          <button class="btn-primary-blackTxt">Ajouter une image</button>
+          <button class="btn-secondary-blackTxt">Publier</button>
         </div>
+      </div>
+      <div :class="$style.posts">
+        <h1>HERE ARE THE POSTS</h1>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios"
 import Navigation from "../components/Navigation"
+import { mapState, mapGetters, mapActions } from "vuex"
 
 export default {
   name: "Home",
   components: {
     Navigation
   },
-  created(){
-    axios({
-      method: "get",
-      url: `http://localhost:3000/api/users/${this.$store.state.userId}`,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.$store.state.token}`
-      }
-    })
-      .then(response => {
-        this.$store.state.firstName = response.data.firstName
-        this.$store.state.lastName = response.data.lastName
-        this.$store.state.profilePicture = response.data.profilePicture
-        this.$store.state.about = response.data.about
-      })
-      .catch(error => { if(error.response) { console.log(error.response.data) }});
+  computed: {
+    ...mapGetters(["fullName"]),
+    ...mapState(["firstName", "lastName", "profilePicture", "about"])
+  },
+  methods: {
+    ...mapActions(["getUserInfos", "resetInfo"])
+  },
+  created() {
+    this.getUserInfos()
+    this.resetInfo()
   }
 }
 </script>
 
-<style lang="scss">
+<style module lang="scss">
 .home__container{
   width: 100%;
   margin: auto;
@@ -56,7 +53,8 @@ export default {
   width: 100%;
   max-width: 400px;
   margin: auto;
-  padding: 20px;
+  padding: 20px 10px;
+  border-radius: 4px;
   background-color: white;
   &__user{
     display: flex;
@@ -64,37 +62,37 @@ export default {
     align-items: center;
     margin-bottom: 10px;
     &__picture{
-      height: 50px;
-      width: 50px;
-      & img{
-        height: 100%;
-        width: 100%;
-        object-fit: contain;
-      }
+      height: 80px;
+      width: 80px;
     }
     &__input{
-      height: 30px;
-      width: 180px;
+      min-height: 60px;
+      width: 60%;
       border-radius: 5px;
     }
   }
   &__buttons{
     display: flex;
     justify-content: space-around;
-    &__addPicture, &__publish{
-      border: none;
-      border-radius: 6px;
-    }
-    &__addPicture{
-      background-color: #1e6d80;
-    }
-    &__publish{
-      background-color: #c71d78;
-    }
   }
+}
+.posts{
+  height: 500px;
+  width: 100%;
+  margin: 10px auto;
+  border-radius: 4px;
+  text-align: center;
+  color: black;
+  background-color: white;
 }
 
 @media (min-width: 480px) {
+  .home__container{
+    width: 80%;
+  }
+}
+
+@media (min-width: 1024px) {
   .home__container{
     width: 60%;
   }
