@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import Login from "../views/Login.vue"
 import Signup from "../views/Signup.vue"
 import Home from "../views/Home.vue"
-import Profile from "../views/Profile.vue"
+import MyProfile from "../views/myProfile.vue"
+import MyProfileEdit from "../views/myProfileEdit.vue"
 
 Vue.use(VueRouter)
 
@@ -25,8 +26,13 @@ const routes = [
   },
   {
     path: '/profile',
-    name: 'Profile',
-    component: Profile
+    name: 'MyProfile',
+    component: MyProfile
+  },
+  {
+    path: '/profile/edit',
+    name: 'MyProfileEdit',
+    component: MyProfileEdit
   }
 ]
 
