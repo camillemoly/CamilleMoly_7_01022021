@@ -6,7 +6,7 @@ const fs = require("fs");
 
 // Get all posts
 exports.getAllPosts = (req, res, next) => {
-  models.posts.findAll({ order: [[ "date", "DESC" ]] }) // TODO: findAndCountAll method to use limit and pagination
+  models.posts.findAll({ order: [[ "id", "DESC" ]] }) // TODO: findAndCountAll method to use limit and pagination
     .then((posts) => {
       if (!posts) {
         res.status(404).json({ error: "Aucun post trouvé !" });
@@ -18,7 +18,7 @@ exports.getAllPosts = (req, res, next) => {
 
 // Get all posts of a user
 exports.getAllPostsOfUser = (req, res, next) => {
-  models.posts.findAll({ where: { user_id: req.params.user_id }, order: [[ "date", "DESC" ]] }) // sort by post date in descending order
+  models.posts.findAll({ where: { user_id: req.params.user_id }, order: [[ "id", "DESC" ]] }) // sort by post date in descending order
     .then((posts) => {
       if (!posts) {
         res.status(404).json({ error: "Aucun post trouvé pour cet utilisateur !" });
