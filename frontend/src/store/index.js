@@ -7,29 +7,31 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    firstName: "",
-    lastName: "",
-    profilePicture: "",
-    about: "",
+    user: {
+      firstName: "",
+      lastName: "",
+      profilePicture: "",
+      about: ""
+    },
     info: null
   },
   getters: {
     fullName: (state) => {
-      return `${state.firstName} ${state.lastName}`
+      return `${state.user.firstName} ${state.user.lastName}`
     }
   },
   mutations: {
     EDIT_FIRST_NAME(state, value) {
-      state.firstName = value
+      state.user.firstName = value
     },
     EDIT_LAST_NAME(state, value) {
-      state.lastName = value
+      state.user.lastName = value
     },
     EDIT_PROFILE_PICTURE(state, value) {
-      state.profilePicture = value
+      state.user.profilePicture = value
     },
     EDIT_ABOUT(state, value) {
-      state.about = value
+      state.user.about = value
     },
     RESET_INFO(state) {
       state.info = null

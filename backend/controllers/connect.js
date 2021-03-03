@@ -57,30 +57,32 @@ exports.signup = (req, res, next) => {
               password: String(hash),
               first_name: String(req.body.first_name),
               last_name: String(req.body.last_name),
-              profile_picture: String("http://127.0.0.1:5500/backend/images/default-profile-picture.jpg"),
+              // define a default profile picture
+              profile_picture: String("https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?b=1&k=6&m=1223671392&s=612x612&w=0&h=5VMcL3a_1Ni5rRHX0LkaA25lD_0vkhFsb1iVm1HKVSQ="),
+              // define an empty about to prevent it from displaying null 
               about: String("")
             });
             res.status(201).json({ message: "Compte utilisateur créé !" });
           })
-          .catch((error) => res.status(500).json({ error }));
+          .catch((error) => res.status(500).json({ message: error.message }));
       }
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Login
 exports.login = (req, res, next) => {
-  models.users.findOne({ where: { email: req.body.email } })
+  models.users.findOne({ where: { email: req.body.email } }) // check if the email corresponds to an account
     .then((user) => {
       if (!user) {
         res.status(404).json({ error: "Aucun compte ne correspond à l'email renseigné !" });
       }
-      bcrypt.compare(req.body.password, user.password)
+      bcrypt.compare(req.body.password, user.password) // compare password with the account password
         .then((valid) => {
           if (!valid) {
             res.status(401).json({ error: "Mot de passe incorrect !" });
           }
-          res.status(200).json({
+          res.status(200).json({ // return user_id, token (expire in 24h) and message
             user_id: user.id,
             token: jwt.sign(
               { user_id: user.id },
@@ -90,7 +92,7 @@ exports.login = (req, res, next) => {
             message: "Utilisateur connecté !"
           });
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };

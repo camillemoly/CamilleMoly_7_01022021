@@ -3,8 +3,8 @@ import VueRouter from 'vue-router'
 import Login from "../views/Login.vue"
 import Signup from "../views/Signup.vue"
 import Home from "../views/Home.vue"
-import MyProfile from "../views/myProfile.vue"
-import MyProfileEdit from "../views/myProfileEdit.vue"
+import MyProfile from "../views/MyProfile.vue"
+import MyProfileEdit from "../views/MyProfileEdit.vue"
 
 Vue.use(VueRouter)
 

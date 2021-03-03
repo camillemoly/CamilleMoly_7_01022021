@@ -1,5 +1,4 @@
 const sequelize = require("../db-connection/db-connection");
-// const { Op } = require("sequelize");
 const initModels = require("../models/init-models");
 const models = initModels(sequelize);
 const numberValidator = new RegExp(/\d/);
@@ -22,12 +21,12 @@ exports.getOneUser = (req, res, next) => {
       }
       res.status(200).json(userFound);
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Modify a user
 exports.modifyUser = (req, res, next) => {
-    const userObject = req.file ? // TODO: fs.unlink like delete when we update a profile_picture you need to delete old picture !
+    const userObject = req.file ? // check if the request contains a file
     {
       ...JSON.parse(req.body.user),
       profile_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -44,12 +43,22 @@ exports.modifyUser = (req, res, next) => {
         return res.status(401).json({ error: "Les champs prénom et nom ne doivent pas contenir de chiffres !" });
       } else if (symbolsValidator.test(userObject.first_name) === false || symbolsValidator.test(userObject.last_name) === false) {
         return res.status(401).json({ error: "Les champs prénom et nom ne doivent pas contenir de caractères spéciaux !" });
+      } else if (req.file) { // if the request contains a file, delete old profile picture to replace it by the new one
+        const filename = user.profile_picture.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          user.update({
+            ...userObject
+          })
+          .then(() => res.status(201).json({ message: "Profil modifié avec succès !" }))
+          .catch((error) => res.status(500).json({ message: error.message }));
+        })
+      } else { // if the request doesn't contain a file, don't delete old profile picture
+        user.update({
+          ...userObject
+        })
+        .then(() => res.status(201).json({ message: "Profil modifié avec succès !" }))
+        .catch((error) => res.status(500).json({ message: error.message }));
       }
-      user.update({
-        ...userObject
-      })
-      .then(() => res.status(201).json({ message: "Profil modifié avec succès !" }))
-      .catch((error) => res.status(500).json({ message: error.message }));
     })
     .catch((error) => res.status(500).json({ message: error.message }));
 };
@@ -62,11 +71,11 @@ exports.deleteUser = (req, res, next) => {
         return res.status(404).json({ error: "Suppression impossible, cet utilisateur n'existe pas !" });
       }
       const filename = user.profile_picture.split("/images/")[1];
-      fs.unlink(`images/${filename}`, () => {
+      fs.unlink(`images/${filename}`, () => { // delete profile picture before deleting profile
         user.destroy()
         .then(() => res.status(200).json({ message: "Utilisateur supprimé !" }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
       })
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
