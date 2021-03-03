@@ -5,41 +5,95 @@
       <div :class="$style.publication">
         <div :class="$style.publication__user">
           <div :class="$style.publication__user__picture" class="img-container-rounded">
-            <img :src="profilePicture" class="img-cover">
+            <img :src="user.profilePicture" class="img-cover">
           </div>
-          <textarea :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ firstName ]] + ', que voulez-vous dire ?'"></textarea>
+          <textarea id="post_content" :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ user.firstName ]] + ', que voulez-vous dire ?'"></textarea>
         </div>
         <div :class="$style.publication__buttons">
-          <button class="btn-primary-blackTxt">Ajouter une image</button>
-          <button class="btn-secondary-blackTxt">Publier</button>
+          <input type="file" id="postPicture" name="postPicture" accept="image/png, image/jpeg" :class="$style.publication__buttons__upload">
+          <button class="btn-secondary-whiteTxt" @click="createPost">Publier</button>
         </div>
       </div>
       <div :class="$style.posts">
-        <h1>HERE ARE THE POSTS</h1>
+        <Post
+          v-for="post in posts"
+          :key="post.id"
+          :postId="post.id"
+          :postUserId="post.user_id"
+          :date="post.date"
+          :content="post.content"
+          :postPicture="post.post_picture"
+          :getAllPosts="getAllPosts"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios"
 import Navigation from "../components/Navigation"
-import { mapState, mapGetters, mapActions } from "vuex"
+import Post from "../components/Post"
+import { mapState, mapActions } from "vuex"
 
 export default {
   name: "Home",
   components: {
-    Navigation
+    Navigation,
+    Post
+  },
+  data(){
+    return{
+      posts: ""
+    }
   },
   computed: {
-    ...mapGetters(["fullName"]),
-    ...mapState(["firstName", "lastName", "profilePicture", "about"])
+    ...mapState(["user"])
   },
   methods: {
-    ...mapActions(["getUserInfos", "resetInfo"])
+    ...mapActions(["getUserInfos", "resetInfo"]),
+    getAllPosts(){
+      axios({
+      method: "get",
+      url: `http://localhost:3000/api/posts/all`,
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      }
+      })
+      .then(response => { 
+        this.posts = response.data
+      })
+      .catch(error => { if(error.response) { console.log(error.response.data.error) }});
+    },
+    createPost(){
+      const formData = new FormData()
+      let postInfos = {
+          user_id: localStorage.getItem("userId"),
+          content: document.getElementById("post_content").value
+      }
+      formData.set("post", JSON.stringify(postInfos))
+      if (document.getElementById("postPicture").value !== "") {
+        formData.set("image", document.getElementById("postPicture").files[0])
+      }
+      axios({
+        method: "post",
+        url: `http://localhost:3000/api/posts`,
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        data: formData
+      })
+      .then(response => { 
+        console.log(response.data.message)
+        this.getAllPosts()
+      })
+      .catch(error => { if(error.response) { console.log(error.response.data.error) }});
+    }
   },
   created() {
     this.getUserInfos()
-    this.resetInfo()
+    this.getAllPosts()
   }
 }
 </script>
@@ -48,10 +102,11 @@ export default {
 .home__container{
   width: 100%;
   margin: auto;
+  padding-bottom: 20px;
 }
 .publication{
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   margin: auto;
   padding: 20px 10px;
   border-radius: 4px;
@@ -69,32 +124,32 @@ export default {
       min-height: 60px;
       width: 60%;
       border-radius: 5px;
+      outline: none;
     }
   }
   &__buttons{
     display: flex;
     justify-content: space-around;
+    &__upload{
+      outline: none;
+      color: black;
+    }
   }
 }
 .posts{
-  height: 500px;
   width: 100%;
   margin: 10px auto;
-  border-radius: 4px;
-  text-align: center;
-  color: black;
-  background-color: white;
 }
 
 @media (min-width: 480px) {
   .home__container{
-    width: 80%;
+    width: 60%;
   }
 }
 
 @media (min-width: 1024px) {
   .home__container{
-    width: 60%;
+    width: 40%;
   }
 }
 </style>
