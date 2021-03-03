@@ -6,14 +6,26 @@ const fs = require("fs");
 
 // Get all posts
 exports.getAllPosts = (req, res, next) => {
-  models.posts.findAll() // TODO: findAndCountAll method to use limit and offset
+  models.posts.findAll({ order: [[ "date", "DESC" ]] }) // TODO: findAndCountAll method to use limit and pagination
     .then((posts) => {
       if (!posts) {
         res.status(404).json({ error: "Aucun post trouvé !" });
       }
       res.status(200).json(posts);
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
+};
+
+// Get all posts of a user
+exports.getAllPostsOfUser = (req, res, next) => {
+  models.posts.findAll({ where: { user_id: req.params.user_id }, order: [[ "date", "DESC" ]] }) // sort by post date in descending order
+    .then((posts) => {
+      if (!posts) {
+        res.status(404).json({ error: "Aucun post trouvé pour cet utilisateur !" });
+      }
+      res.status(200).json(posts);
+    })
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Get one post
@@ -25,45 +37,66 @@ exports.getOnePost = (req, res, next) => {
       }
       res.status(200).json(post);
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Create a post
 exports.createPost = (req, res, next) => {
   const date = moment(new Date()).format("YYYY-MM-DD");
-  models.users.findOne({ where: { id: req.body.user_id } })
+  const postObject = req.file ? // check if the request contains a file
+    {
+      ...JSON.parse(req.body.post),
+      post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...JSON.parse(req.body.post) }
+  models.users.findOne({ where: { id: postObject.user_id } })
     .then((user) => {
       if (!user) {
         return res.status(404).json({ error: "Création de post impossible, cet utilisateur n'existe pas !" });
-      } else if (!req.body.content) {
+      } else if (!postObject.content) {
         return res.status(401).json({ error: "Un post doit contenir du texte !" });
       }
       const post = models.posts.create({
-        ...req.body, // user_id, content, post_picture
+        ...postObject, // user_id, content, post_picture
         date: date
       })
         .then(() => res.status(201).json({ message: "Post créé !" }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Modify a post
 exports.modifyPost = (req, res, next) => {
+  const postObject = req.file ?
+    {
+      ...JSON.parse(req.body.post),
+      post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...JSON.parse(req.body.post) }
   models.posts.findOne({ where: { id: req.params.id } })
     .then((post) => {
       if (!post) {
         return res.status(404).json({ error: "Modification impossible, ce post n'existe pas !" });
-      } else if (!req.body.content) {
+      } else if (!postObject.content) {
         return res.status(401).json({ error: "Un post doit contenir du texte !" });
+      } else if (post.post_picture && req.file) {
+        // if the post already contains a picture and the request contains a file, delete old post picture to replace it by the new one
+        const filename = post.post_picture.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          post.update({
+            ...postObject
+          })
+          .then(() => res.status(201).json({ message: "Post modifié avec succès !" }))
+          .catch((error) => res.status(500).json({ message: error.message }));
+        })
+      } else {
+        post.update({
+          ...postObject
+        })
+        .then(() => res.status(201).json({ message: "Post modifié avec succès !" }))
+        .catch((error) => res.status(500).json({ message: error.message }));
       }
-      post.update({
-        ...req.body // content, post_picture
-      })
-        .then(() => res.status(201).json({ message: "Post modifié !" }))
-        .catch((error) => res.status(500).json({ error }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Delete a post
@@ -73,11 +106,20 @@ exports.deletePost = (req, res, next) => {
       if (!post) {
         return res.status(404).json({ error: "Suppression impossible, ce post n'existe pas !" });
       }
-      post.destroy()
-        .then(() => res.status(200).json({ message: "Post supprimé !" }))
-        .catch((error) => res.status(500).json({ error }));
+      if(post.post_picture) { // if the post contains a picture, delete it
+        const filename = post.post_picture.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          post.destroy()
+          .then(() => res.status(200).json({ message: "Post supprimé !" }))
+          .catch((error) => res.status(500).json({ message: error.message }));
+        })
+      } else {
+        post.destroy()
+          .then(() => res.status(200).json({ message: "Post supprimé !" }))
+          .catch((error) => res.status(500).json({ message: error.message }));
+      }
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Like a post
@@ -96,11 +138,11 @@ exports.likePost = (req, res, next) => {
             ...req.body //user_id, post_id
           })
             .then(() =>res.status(201).json({ message: "Publication likée !" }))
-            .catch((error) => res.status(500).json({ error }));
+            .catch((error) => res.status(500).json({ message: error.message }));
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Unlike a post
@@ -112,9 +154,9 @@ exports.unlikePost = (req, res, next) => {
       }
       like.destroy()
         .then(() => res.status(200).json({ message: "Like annulé !" }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Comment a post
@@ -135,11 +177,11 @@ exports.commentPost = (req, res, next) => {
             ...req.body //user_id, post_id, content
           })
             .then(() => res.status(201).json({ message: "Commentaire ajouté !" }))
-            .catch((error) => res.status(500).json({ error }));
+            .catch((error) => res.status(500).json({ message: error.message }));
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Modify comment of a post
@@ -155,9 +197,9 @@ exports.modifyCommentPost = (req, res, next) => {
         ...req.body // content
       })
         .then(() => res.status(201).json({ message: "Commentaire modifié !" }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
 
 // Delete comment of a post
@@ -169,7 +211,7 @@ exports.deleteCommentPost = (req, res, next) => {
       }
       comment.destroy()
         .then(() => res.status(200).json({ message: "Commentaire supprimé !" }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: error.message }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 };
