@@ -21,8 +21,6 @@ export default {
   name: 'Navigation',
   computed: {
     ...mapState(["user"])
-  },
-  methods: {
   }
 }
 </script>

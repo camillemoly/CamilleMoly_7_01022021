@@ -7,6 +7,7 @@
 <script>
 import axios from "axios"
 import Authentication from "../components/Authentication"
+import { mapActions } from "vuex"
 
 export default {
   name: "Login",
@@ -25,6 +26,14 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["resetInfo"]),
+
+    /********************* LOGIN ********************* /
+     * This function calls the API to connect the user,
+     * displays the API response (fail or success) by storing it in the vuex info state,
+     * store in the localStorage his userId and the generated token,
+     * and redirects him to the home page
+     */
     login() {
       axios({
         method: "post",
@@ -45,6 +54,15 @@ export default {
       })
       .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
     }
+  },
+
+  /*************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) *************** /
+   * It calls the resetInfo function (stored in vuex actions),
+   * to delete the value of info state,
+   * to not display the error of success message of signup page
+   */
+  created(){
+    this.resetInfo()
   }
 }
 </script>

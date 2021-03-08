@@ -52,6 +52,12 @@ export default {
   },
   methods: {
     ...mapActions(["getUserInfos", "resetInfo"]),
+
+    /*************** GET ALL POSTS *************** /
+     * This function calls the API to get all posts,
+     * stores them in the posts data,
+     * and displays them
+     */
     getAllPosts(){
       axios({
       method: "get",
@@ -65,6 +71,11 @@ export default {
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
+
+    /**************** CREATE POST **************** /
+     * This function calls the API to create a post,
+     * then it calls the getAllPosts function to update the news feed without reloading the page
+     */
     createPost(){
       const formData = new FormData()
       let postInfos = {
@@ -79,18 +90,26 @@ export default {
         method: "post",
         url: `http://localhost:3000/api/posts`,
         headers: {
-            "Content-Type": "multipart/form-data",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: formData
       })
       .then(response => { 
         console.log(response.data.message)
         this.getAllPosts()
+        document.getElementById("post_content").value = ""
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     }
   },
+
+  /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
+   * It calls the getUserInfos function (stored in vuex actions)
+   * to get the information (first name, last name, profile picture and about)
+   * of the connected user and store them as vuex states
+   * It also calls the getAllPosts function to retrieve all the posts and displays them
+   */
   created() {
     this.getUserInfos()
     this.getAllPosts()

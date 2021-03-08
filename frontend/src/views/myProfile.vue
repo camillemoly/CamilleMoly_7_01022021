@@ -56,6 +56,12 @@ export default {
   },
   methods: {
     ...mapActions(["getUserInfos","resetInfo", "signOut"]),
+
+    /*************** GET MY ALL POSTS *************** /
+     * This function calls the API to get all posts of the connected user,
+     * stores them in the posts data,
+     * and displays them
+     */
     getMyAllPosts(){
       axios({
       method: "get",
@@ -75,6 +81,13 @@ export default {
       });
     }
   },
+
+  /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
+   * It calls the getUserInfos function (stored in vuex actions)
+   * to get the information (first name, last name, profile picture and about)
+   * of the connected user and store them as vuex states
+   * It also calls the getMyAllPosts function to retrieve all the posts and displays them
+   */
   created() {
     this.getUserInfos()
     this.getMyAllPosts()

@@ -40,6 +40,11 @@ export default {
   name: 'Authentication',
   props: ["form", "auth", "info"],
   methods: {
+
+    /*************** SHOW PASSWORD *************** /
+     * This function changes type of the password input
+     * to show or hide the password
+     */
     showPassword() {
       var x = document.getElementById("password");
       if (x.type === "password") {
