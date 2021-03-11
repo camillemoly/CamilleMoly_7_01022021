@@ -95,8 +95,7 @@ export default {
         },
         data: formData
       })
-      .then(response => { 
-        console.log(response.data.message)
+      .then(() => { 
         this.getAllPosts()
         document.getElementById("post_content").value = ""
       })
@@ -142,13 +141,13 @@ export default {
     &__input{
       min-height: 60px;
       width: 60%;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
     }
   }
   &__buttons{
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     &__upload{
       outline: none;
       color: black;

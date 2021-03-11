@@ -1,68 +1,70 @@
 .btn-primary-blackTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: black;
-    background-color: $color-primary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: black;
+  background-color: $color-primary;
 }
 .btn-primary-whiteTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: white;
-    background-color: $color-primary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  background-color: $color-primary;
 }
 .btn-secondary-blackTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: black;
-    background-color: $color-secondary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: black;
+  background-color: $color-secondary;
 }
 .btn-secondary-whiteTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: white;
-    background-color: $color-secondary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  background-color: $color-secondary;
 }
 .btn-tertiary-blackTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: black;
-    background-color: $color-tertiary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: black;
+  background-color: $color-tertiary;
 }
 .btn-tertiary-whiteTxt{
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: white;
-    background-color: $color-tertiary;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  background-color: $color-tertiary;
 }
 .info{
-    background-color: $color-secondary;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background-color: $color-secondary;
 }
 .img-cover{
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }
 .img-container-rounded{
-    border-radius: 50%;
-    overflow: hidden;
+  border-radius: 50%;
+  overflow: hidden;
 }
 ::-webkit-file-upload-button{
-    border: none;
-    border-radius: 4px;
-    outline: none;
-    cursor: pointer;
-    color: white;
-    background: #1dc7c1;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  background: #1dc7c1;
 }
