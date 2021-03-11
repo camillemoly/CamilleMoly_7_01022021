@@ -2,12 +2,12 @@
   <div :class="$style.post">
 
     <!-- Setting button -->
-    <div v-if="postUserId == userConnected" :class="$style.post__settings" class="dropright">
+    <div v-if="postUserId == userConnected || adminId == userConnected" :class="$style.post__settings" class="dropright">
       <button class="btn-primary-whiteTxt" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a @click="isEdit = true" class="dropdown-item" :class="$style.post__settings__edit">Modifier</a>
+        <a @click="postIsEditing = true" class="dropdown-item" :class="$style.post__settings__edit">Modifier</a>
         <a @click="deletePost" class="dropdown-item" :class="$style.post__settings__delete">Supprimer</a>
       </div>
     </div>
@@ -26,38 +26,40 @@
     </div>
 
     <!-- Content, post picture and button when the post is not editing -->
-    <p v-show="isEdit == false" :class="$style.post__content">{{ content }}</p>
-    <img v-show="isEdit == false && postPicture !== null" :class="$style.post__picture" :src="postPicture"/>
-    <div v-show="isEdit == false" :class="$style.post__buttons">
+    <p v-show="postIsEditing == false" :class="$style.post__content">{{ content }}</p>
+    <img v-show="postIsEditing == false && postPicture !== null" :class="$style.post__picture" :src="postPicture"/>
+    <div v-show="postIsEditing == false" :class="$style.post__buttons">
 
       <!-- Like button when the post is not liked -->
-      <button v-show="isLiked == false" class="btn-primary-whiteTxt like" @click="likePost">
-        <span v-show="likes.length > 0">{{ likes.length }} </span><span v-show="likes.length == 0"> J'aime </span>
+      <button v-show="postIsLiked == false" class="btn-primary-whiteTxt like" @click="likePost">
+        <span v-show="likes.length > 0">{{ likes.length }} </span>
+        <span v-show="likes.length == 0"> J'aime </span>
         <i class="fas fa-thumbs-up"></i>
       </button>
       <!-- Like button when the post is liked -->
-      <button v-show="isLiked" class="btn-secondary-whiteTxt like" @click="unlikePost">
-        <span v-show="likes.length > 0">{{ likes.length }} </span><span v-show="likes.length == 0"> J'aime </span>
+      <button v-show="postIsLiked" class="btn-secondary-whiteTxt like" @click="unlikePost">
+        <span v-show="likes.length > 0">{{ likes.length }} </span>
+        <span v-show="likes.length == 0"> J'aime </span>
         <i class="fas fa-thumbs-up"></i>
       </button>
-      <button class="btn-primary-whiteTxt" @click="showComments = true">Commenter</button>
-
+      <button class="btn-primary-whiteTxt" @click="showHideComments">
+        <span>Commenter</span>
+      </button>
+      <span v-show="comments.length > 0" @click="showHideComments" :class="$style.post__comments__number">{{ comments.length }} commentaire<span v-show="comments.length > 1">s</span></span>
     </div>
 
     <!-- Comments area -->
-    <div v-show="showComments" :class="$style.post__comments">
-      <button @click="showComments = false" :class="$style.post__comments__close" class="btn-tertiary-whiteTxt">
-        <i class="fas fa-times"></i>
-      </button>
-      <input :class="$style.post__comments__input" placeholder="Commentez ici...">
+    <div v-show="showComments && postIsEditing == false" :class="$style.post__comments">
+      <input :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici...">
       <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary-whiteTxt">
-        <i class="fas fa-caret-right"></i>
+        <i class="fab fa-telegram-plane"></i>
       </button>
       <Comment
         v-for="comment in comments"
         :key="comment.id"
         :commentId="comment.id"
         :commentUserId="comment.user_id"
+        :commentPostId="comment.post_id"
         :content="comment.content"
         :getAllCommentsOfAPost="getAllCommentsOfAPost"
         :userConnected="userConnected"
@@ -65,8 +67,8 @@
     </div>
 
     <!-- Content, post picture and button when the post is editing -->
-    <input v-show="isEdit" :id="'editContent' + [[ postId ]]" :class="$style.post__content" :value="content"/>
-    <div v-show="isEdit" :class="$style.post__buttons">
+    <input v-show="postIsEditing" :id="'editPostContent' + [[ postId ]]" :class="$style.post__content" :value="content"/>
+    <div v-show="postIsEditing" :class="$style.post__buttons">
       <input type="file" :id="'editPostPicture' + [[ postId ]]" name="postPicture" accept="image/png, image/jpeg">
       <button class="btn-secondary-whiteTxt" @click="updatePost">Valider</button>
     </div>
@@ -76,6 +78,7 @@
 <script>
 import axios from "axios"
 import Comment from "./Comment"
+import { mapState } from "vuex"
 
 export default {
   name: "Post",
@@ -86,13 +89,16 @@ export default {
   data() {
     return {
       user: "",
-      likes: [],
+      likes: "",
       comments: "",
       userConnected: localStorage.getItem("userId"),
-      isEdit: false,
-      isLiked: false,
+      postIsEditing: false,
+      postIsLiked: false,
       showComments: false
-    };
+    }
+  },
+  computed: {
+    ...mapState(["adminId"])
   },
   methods: {
 
@@ -107,7 +113,7 @@ export default {
     updatePost() {
       const formData = new FormData()
       let postInfos = {
-        content: document.getElementById(`editContent` + this.postId).value
+        content: document.getElementById(`editPostContent` + this.postId).value
       }
       formData.set("post", JSON.stringify(postInfos))
       if (document.getElementById(`editPostPicture` + this.postId).value !== "") {
@@ -124,9 +130,8 @@ export default {
         data: formData
       })
 
-      .then(response => { 
-        this.$store.state.info = `${response.data.message}`
-        this.isEdit = false
+      .then(() => { 
+        this.postIsEditing = false
         if (this.$route.name == 'Home') {
           this.getAllPosts()
         } else if (this.$route.name == 'MyProfile') {
@@ -134,7 +139,7 @@ export default {
         }
       })
 
-      .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
+      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
     },
 
     /********************* DELETE POST ********************* /
@@ -147,7 +152,7 @@ export default {
         url: `http://localhost:3000/api/posts/${this.postId}`,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        }
       })
 
       .then(() => {
@@ -177,11 +182,10 @@ export default {
       })
 
       .then(response => {
-        this.likes = []
-        for (let like in response.data) {
-          this.likes.push(response.data[like])
-          if (response.data[like].user_id == localStorage.getItem("userId")) {
-            this.isLiked = true
+        this.likes = response.data
+        for (let like in this.likes) {
+          if (this.likes[like].user_id == localStorage.getItem("userId")) {
+            this.postIsLiked = true
           }
         }
       })
@@ -191,7 +195,7 @@ export default {
 
     /********************* LIKE POST ********************* /
      * The function calls the API to create the like of the post,
-     * then it passes the isLiked to TRUE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
+     * then it passes the postIsLiked to TRUE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
      */
     likePost() {
       axios({
@@ -207,7 +211,7 @@ export default {
       })
 
       .then(() => {
-        this.isLiked = true
+        this.postIsLiked = true
         this.likes.push(`like of ${localStorage.getItem("userId")}`)
       })
 
@@ -216,7 +220,7 @@ export default {
 
     /********************* UNLIKE POST ********************* /
      * The function calls the API to delete the like of the post,
-     * then it passes the isLiked to FALSE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
+     * then it passes the postIsLiked to FALSE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
      */
     unlikePost() {
       axios({
@@ -232,7 +236,7 @@ export default {
       })
 
       .then(() => {
-        this.isLiked = false
+        this.postIsLiked = false
         this.likes.pop(`like of ${localStorage.getItem("userId")}`)
       })
 
@@ -240,6 +244,16 @@ export default {
     },
 
 /*********************************************************** COMMENTS ************************************************************/
+    /********************* GET ALL COMMENTS OF A POST ********************* /
+     * 
+     */
+    showHideComments() {
+      if (this.showComments == false) {
+        this.showComments = true
+      } else if (this.showComments) {
+        this.showComments = false
+      }
+    },
 
     /********************* GET ALL COMMENTS OF A POST ********************* /
      * 
@@ -264,8 +278,23 @@ export default {
      * 
      */
     commentPost() {
-      this.showComments = true
-      console.log("Comment post")
+      axios({
+        method: "post",
+        url: `http://localhost:3000/api/posts/${this.postId}/comments`,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        data: {
+          user_id: Number(localStorage.getItem("userId")),
+          content: document.getElementById(`commentInput` + this.postId).value
+        }
+      })
+      .then(() => { 
+        this.getAllCommentsOfAPost()
+        document.getElementById(`commentInput` + this.postId).value = ""
+      })
+      .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     }
 
   },
@@ -350,15 +379,25 @@ export default {
   &__buttons {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
     width: 100%;
     margin-top: 10px;
+    & button{
+      margin: 5px;
+    }
   }
   &__comments {
     width: 100%;
     margin-top: 30px;
     text-align: center;
-    &__close, &__valid {
-      width: 25px;
+    &__number{
+      margin: 5px;
+      font-weight: bold;
+      color: $color-primary;
+      cursor: pointer;
+    }
+    &__valid {
+      width: 30px;
       margin: 0 10px;
     }
     &__input {

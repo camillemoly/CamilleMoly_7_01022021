@@ -2,12 +2,12 @@
   <div :class="$style.comment">
 
     <!-- Setting button -->
-    <div v-if="commentUserId == userConnected" :class="$style.comment__settings" class="dropright">
+    <div v-if="commentUserId == userConnected || adminId == userConnected" :class="$style.comment__settings" class="dropright">
       <button class="btn-primary-whiteTxt " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a @click="editComment" class="dropdown-item" :class="$style.comment__settings__edit">Modifier</a>
+        <a @click="commentIsEditing = true" class="dropdown-item" :class="$style.comment__settings__edit">Modifier</a>
         <a @click="deleteComment" class="dropdown-item" :class="$style.comment__settings__delete">Supprimer</a>
       </div>
     </div>
@@ -23,47 +23,74 @@
     </div>
 
     <!-- Content when the comment is not editing -->
-    <p v-show="isEdit == false" :class="$style.comment__content">{{ content }}</p>
+    <p v-show="commentIsEditing == false" :class="$style.comment__content">{{ content }}</p>
 
     <!-- Content when the post is editing -->
-    <input v-show="isEdit" :id="'editContent' + [[ commentId ]]" :class="$style.comment__content__editInput" :value="content"/>
-    <button v-show="isEdit" class="btn-secondary-whiteTxt" @click="updateComment">Valider</button>
+    <input v-show="commentIsEditing" :id="'editCommentContent' + [[ commentId ]]" :class="$style.comment__content__editInput" :value="content"/>
+    <button v-show="commentIsEditing" :class="$style.comment__content__editButton" class="btn-secondary-whiteTxt" @click="updateComment">Valider</button>
 
   </div>
 </template>
 
 <script>
 import axios from "axios"
+import { mapState } from "vuex"
 
 export default {
   name: "Comment",
-  props: ["commentId", "commentUserId", "content", "getAllCommentsOfAPost", "userConnected"],
+  props: ["commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost", "userConnected"],
   data() {
     return {
       user: "",
-      isEdit: false
+      commentIsEditing: false
     }
   },
+  computed: {
+    ...mapState(["adminId"])
+  },
   methods: {
-
-    /********************* EDIT COMMENT ********************* /
-     * 
-     */
-    editComment() {
-      this.isEdit = true
-    },
 
     /******************** UPDATE COMMENT ******************** /
      * 
      */
     updateComment() {
-      this.isEdit = false // Si on edit le post ou que l'on ferme la partie comment, il faut faire this.isEdit = false
+      axios({
+        method: "put",
+        url: `http://localhost:3000/api/posts/${this.commentPostId}/comments/${this.commentId}`,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        data: {
+          content: document.getElementById(`editCommentContent` + this.commentId).value
+        }
+      })
+
+      .then(() => { // TODO: Si on edit le post ou que l'on ferme la partie comment, il faut faire this.commentIsEditing = false également
+        this.commentIsEditing = false
+        this.getAllCommentsOfAPost()
+      })
+
+      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+
     },
     /******************** DELETE COMMENT ******************** /
      * 
      */
     deleteComment() {
-      console.log("Delete comment")
+      axios({
+        method: "delete",
+        url: `http://localhost:3000/api/posts/${this.commentPostId}/comments/${this.commentId}`,
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      })
+
+      .then(() => {
+        this.getAllCommentsOfAPost()
+      })
+
+      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
     }
   },
 
