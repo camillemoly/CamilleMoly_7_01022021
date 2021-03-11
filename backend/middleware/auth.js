@@ -10,6 +10,7 @@ module.exports = (req, res, next) => {
       // compare req userId and userId decoded of token
       return res.status(401).json({ error: "Identifiant d'utilisateur invalide !" });
     } else {
+      req.user = decodedToken;
       next();
     }
   } catch {
