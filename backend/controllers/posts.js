@@ -21,7 +21,7 @@ const getPagingData = (data, page, limit) => {
 };
 
 // Get all posts and pagination
-exports.getAllPostsAndPagination = (req, res) => {
+exports.getAllPosts = (req, res) => {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
 
@@ -37,21 +37,6 @@ exports.getAllPostsAndPagination = (req, res) => {
       } else {
         const response = getPagingData(posts, page, limit)
         return res.status(200).json(response);
-      }
-    })
-
-    .catch(error => res.status(500).json({ message: error.message }));
-};
-
-// Get all posts
-exports.getAllPosts = (req, res) => {
-  models.posts.findAll({ order: [[ "id", "DESC" ]] })
-
-    .then(posts => {
-      if (!posts) {
-        return res.status(404).json({ error: "Aucun post trouvé !" });
-      } else {
-        return res.status(200).json(posts);
       }
     })
 
