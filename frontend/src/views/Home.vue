@@ -23,7 +23,14 @@
           :date="post.date"
           :content="post.content"
           :postPicture="post.post_picture"
-          :getAllPosts="getAllPosts"
+        />
+      </div>
+      <div :class="$style.pagination">
+        <Page
+          v-for="index in Number(totalPages)"
+          :key="index"
+          :differentPage="index"
+          :getPostsOfThisPage="getPostsOfThisPage"
         />
       </div>
     </div>
@@ -34,17 +41,22 @@
 import axios from "axios"
 import Navigation from "../components/Navigation"
 import Post from "../components/Post"
+import Page from "../components/Page"
 import { mapState, mapActions } from "vuex"
 
 export default {
   name: "Home",
   components: {
     Navigation,
-    Post
+    Post,
+    Page
   },
   data(){
     return{
-      posts: ""
+      posts: "",
+      totalPosts: "",
+      currentPage: "",
+      totalPages: ""
     }
   },
   computed: {
@@ -53,28 +65,36 @@ export default {
   methods: {
     ...mapActions(["getUserInfos", "resetInfo"]),
 
-    /*************** GET ALL POSTS *************** /
+    /*************** GET POSTS OF THIS PAGE *************** /
      * This function calls the API to get all posts,
      * stores them in the posts data,
      * and displays them
      */
-    getAllPosts(){
+    getPostsOfThisPage(){
+      const currentURL = new URLSearchParams(window.location.search)
+      const currentPage = (Number(currentURL.get("page")) - 1)
       axios({
       method: "get",
-      url: `http://localhost:3000/api/posts/all`,
+      url: `http://localhost:3000/api/posts/all?page=${currentPage}`,
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       }
       })
       .then(response => { 
-        this.posts = response.data
+        this.posts = response.data.posts
+        this.totalPosts = response.data.totalPosts
+        this.totalPages = response.data.totalPages
+        this.currentPage = response.data.currentPage
+        if (this.posts == "") {
+          this.$router.push({ name: "Home" })
+        }
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
     /**************** CREATE POST **************** /
      * This function calls the API to create a post,
-     * then it calls the getAllPosts function to update the news feed without reloading the page
+     * then it calls the getPostsOfThisPage function to update the news feed without reloading the page
      */
     createPost(){
       const formData = new FormData()
@@ -96,7 +116,7 @@ export default {
         data: formData
       })
       .then(() => { 
-        this.getAllPosts()
+        this.getPostsOfThisPage()
         document.getElementById("post_content").value = ""
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
@@ -107,11 +127,11 @@ export default {
    * It calls the getUserInfos function (stored in vuex actions)
    * to get the information (first name, last name, profile picture and about)
    * of the connected user and store them as vuex states
-   * It also calls the getAllPosts function to retrieve all the posts and displays them
+   * It also calls the getPostsOfThisPage function to retrieve all the posts and displays them
    */
   created() {
     this.getUserInfos()
-    this.getAllPosts()
+    this.getPostsOfThisPage()
   }
 }
 </script>
@@ -157,6 +177,10 @@ export default {
 .posts{
   width: 100%;
   margin: 10px auto;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
 }
 
 @media (min-width: 480px) {
