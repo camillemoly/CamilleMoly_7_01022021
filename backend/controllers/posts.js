@@ -3,13 +3,49 @@ const initModels = require("../models/init-models");
 const models = initModels(sequelize);
 const moment = require("moment");
 const fs = require("fs");
+
 const userCheck = (req) => {
   return req.user.user_id;
 }
+const getPagination = (page, size) => {
+  const limit = size ? +size : 2;
+  const offset = page ? page * limit : 0;
+  return { limit, offset };
+};
+const getPagingData = (data, page, limit) => {
+  const { count: totalPosts, rows: posts } = data;
+  const currentPage = page ? +page : 0;
+  const totalPages = Math.ceil(totalPosts / limit);
+
+  return { totalPosts, posts, totalPages, currentPage };
+};
+
+// Get all posts and pagination
+exports.getAllPostsAndPagination = (req, res) => {
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+
+  models.posts.findAndCountAll({ 
+    limit: limit,
+    offset: offset,
+    order: [[ "id", "DESC" ]]
+  })
+
+    .then(posts => {
+      if (!posts) {
+        return res.status(404).json({ error: "Aucun post trouvé !" });
+      } else {
+        const response = getPagingData(posts, page, limit)
+        return res.status(200).json(response);
+      }
+    })
+
+    .catch(error => res.status(500).json({ message: error.message }));
+};
 
 // Get all posts
 exports.getAllPosts = (req, res) => {
-  models.posts.findAll({ order: [[ "id", "DESC" ]] }) // TODO: findAndCountAll method to use limit and pagination
+  models.posts.findAll({ order: [[ "id", "DESC" ]] })
 
     .then(posts => {
       if (!posts) {
