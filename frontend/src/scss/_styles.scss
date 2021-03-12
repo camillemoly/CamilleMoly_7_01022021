@@ -5,6 +5,9 @@
   cursor: pointer;
   color: black;
   background-color: $color-primary;
+  &:hover{
+    background-color: darken($color-primary, 5%);
+  }
 }
 .btn-primary-whiteTxt{
   border-radius: 4px;
@@ -13,6 +16,9 @@
   cursor: pointer;
   color: white;
   background-color: $color-primary;
+  &:hover{
+    background-color: darken($color-primary, 5%);
+  }
 }
 .btn-secondary-blackTxt{
   border-radius: 4px;
@@ -21,6 +27,9 @@
   cursor: pointer;
   color: black;
   background-color: $color-secondary;
+  &:hover{
+    background-color: darken($color-secondary, 5%);
+  }
 }
 .btn-secondary-whiteTxt{
   border-radius: 4px;
@@ -29,6 +38,9 @@
   cursor: pointer;
   color: white;
   background-color: $color-secondary;
+  &:hover{
+    background-color: darken($color-secondary, 5%);
+  }
 }
 .btn-tertiary-blackTxt{
   border-radius: 4px;
@@ -37,6 +49,9 @@
   cursor: pointer;
   color: black;
   background-color: $color-tertiary;
+  &:hover{
+    background-color: darken($color-tertiary, 5%);
+  }
 }
 .btn-tertiary-whiteTxt{
   border-radius: 4px;
@@ -45,6 +60,9 @@
   cursor: pointer;
   color: white;
   background-color: $color-tertiary;
+  &:hover{
+    background-color: darken($color-tertiary, 5%);
+  }
 }
 .info{
   padding: 3px 10px;
@@ -67,4 +85,7 @@
   cursor: pointer;
   color: white;
   background: #1dc7c1;
+  &:hover{
+    background-color: darken(#1dc7c1, 5%);
+  }
 }
