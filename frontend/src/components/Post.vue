@@ -50,10 +50,12 @@
 
     <!-- Comments area -->
     <div v-show="showComments && postIsEditing == false" :class="$style.post__comments">
-      <input :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici...">
-      <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary-whiteTxt">
-        <i class="fab fa-telegram-plane"></i>
-      </button>
+      <div :class="$style.post__comments__area">
+        <textarea :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici..."></textarea>
+        <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary-whiteTxt">
+          <i class="fab fa-telegram-plane"></i>
+        </button>
+      </div>
       <Comment
         v-for="comment in comments"
         :key="comment.id"
@@ -396,13 +398,19 @@ export default {
       color: $color-primary;
       cursor: pointer;
     }
-    &__valid {
-      width: 30px;
-      margin: 0 10px;
+    &__area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     &__input {
       width: 70%;
       margin-bottom: 10px;
+    }
+    &__valid {
+      height: 30px;
+      width: 30px;
+      margin: 0 10px;
     }
   }
 }

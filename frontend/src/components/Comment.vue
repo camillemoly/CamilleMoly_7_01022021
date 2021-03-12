@@ -148,7 +148,6 @@ export default {
   &__content {
     margin: 5px;
     text-align: left!important;
-    font-size: 1.2rem;
     &__editInput {
       width: 80%;
       margin: 5px;
