@@ -7,50 +7,43 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: {
+    userConnected: {
+      id: localStorage.getItem("userId"),
       firstName: "",
       lastName: "",
       profilePicture: "",
-      about: ""
+      about: "",
+      isAdmin: ""
     },
-    adminId: 74,
     info: null
   },
   getters: {
     fullName: (state) => {
-      return `${state.user.firstName} ${state.user.lastName}`
+      return `${state.userConnected.firstName} ${state.userConnected.lastName}`
     }
   },
   mutations: {
+    EDIT_ID(state, value) {
+      state.userConnected.id = value
+    },
     EDIT_FIRST_NAME(state, value) {
-      state.user.firstName = value
+      state.userConnected.firstName = value
     },
     EDIT_LAST_NAME(state, value) {
-      state.user.lastName = value
+      state.userConnected.lastName = value
     },
     EDIT_PROFILE_PICTURE(state, value) {
-      state.user.profilePicture = value
+      state.userConnected.profilePicture = value
     },
     EDIT_ABOUT(state, value) {
-      state.user.about = value
+      state.userConnected.about = value
     },
-    RESET_INFO(state) {
-      state.info = null
+    EDIT_IS_ADMIN(state, value) {
+      state.userConnected.isAdmin = value
     }
   },
   actions: {
-    signOut(context){
-      context.commit("EDIT_FIRST_NAME", "")
-      context.commit("EDIT_LAST_NAME", "")
-      context.commit("EDIT_PROFILE_PICTURE", "")
-      context.commit("EDIT_ABOUT", "")
-      context.commit("RESET_INFO")
-      localStorage.clear()
-      router.push({ name: "Login" })
-    },
-    resetInfo(context){
-      context.commit("RESET_INFO")
-    },
+
     getUserInfos(context) {
       axios({
         method: "get",
@@ -65,15 +58,25 @@ export default new Vuex.Store({
         context.commit("EDIT_LAST_NAME", user.data.last_name)
         context.commit("EDIT_PROFILE_PICTURE", user.data.profile_picture)
         context.commit("EDIT_ABOUT", user.data.about)
+        context.commit("EDIT_IS_ADMIN", user.data.is_admin)
       })
       .catch(error => { 
         if(error.response) {
-            console.log(error.response.data.error)
-            context.dispatch("signOut")
+          console.log(error.response.data.error)
+          context.dispatch("signOut")
         }
       });
+    },
+
+    signOut(context){
+      context.commit("EDIT_ID", "")
+      context.commit("EDIT_FIRST_NAME", "")
+      context.commit("EDIT_LAST_NAME", "")
+      context.commit("EDIT_PROFILE_PICTURE", "")
+      context.commit("EDIT_ABOUT", "")
+      context.commit("EDIT_IS_ADMIN", "")
+      localStorage.clear()
+      router.push({ name: "Login" })
     }
-  },
-  modules: {
   }
 })
