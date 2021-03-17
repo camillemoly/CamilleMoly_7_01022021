@@ -1,83 +1,54 @@
-.btn-primary-blackTxt{
+button {
   border-radius: 4px;
   border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: black;
+  color: white;
+  &:focus {
+    outline: none;
+  }
+}
+
+input:focus, textarea:focus {
+  outline: none;
+}
+
+.btn-primary{
   background-color: $color-primary;
   &:hover{
     background-color: darken($color-primary, 5%);
   }
 }
-.btn-primary-whiteTxt{
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: white;
-  background-color: $color-primary;
-  &:hover{
-    background-color: darken($color-primary, 5%);
-  }
-}
-.btn-secondary-blackTxt{
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: black;
+
+.btn-secondary{
   background-color: $color-secondary;
   &:hover{
     background-color: darken($color-secondary, 5%);
   }
 }
-.btn-secondary-whiteTxt{
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: white;
-  background-color: $color-secondary;
-  &:hover{
-    background-color: darken($color-secondary, 5%);
-  }
-}
-.btn-tertiary-blackTxt{
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: black;
+
+.btn-tertiary{
   background-color: $color-tertiary;
   &:hover{
     background-color: darken($color-tertiary, 5%);
   }
 }
-.btn-tertiary-whiteTxt{
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: white;
-  background-color: $color-tertiary;
-  &:hover{
-    background-color: darken($color-tertiary, 5%);
-  }
-}
+
 .info{
   padding: 3px 10px;
   border-radius: 4px;
   background-color: $color-secondary;
 }
+
 .img-cover{
   height: 100%;
   width: 100%;
   object-fit: cover;
 }
+
 .img-container-rounded{
   border-radius: 50%;
   overflow: hidden;
 }
+
 ::-webkit-file-upload-button{
   border: none;
   border-radius: 4px;
