@@ -10,16 +10,16 @@ function initModels(sequelize) {
   var posts = _posts(sequelize, DataTypes);
   var users = _users(sequelize, DataTypes);
 
-  comments.belongsTo(users, { as: "user", foreignKey: "user_id" });
-  users.hasMany(comments, { as: "comments", foreignKey: "user_id" });
-  comments.belongsTo(posts, { as: "post", foreignKey: "post_id" });
-  posts.hasMany(comments, { as: "comments", foreignKey: "post_id" });
-  likes.belongsTo(users, { as: "user", foreignKey: "user_id" });
-  users.hasMany(likes, { as: "likes", foreignKey: "user_id" });
-  likes.belongsTo(posts, { as: "post", foreignKey: "post_id" });
-  posts.hasMany(likes, { as: "likes", foreignKey: "post_id" });
-  posts.belongsTo(users, { as: "user", foreignKey: "user_id" });
-  users.hasMany(posts, { as: "posts", foreignKey: "user_id" });
+  comments.belongsTo(users, { as: "user", foreignKey: "user_id"});
+  users.hasMany(comments, { as: "comments", foreignKey: "user_id"});
+  comments.belongsTo(posts, { as: "post", foreignKey: "post_id"});
+  posts.hasMany(comments, { as: "comments", foreignKey: "post_id"});
+  likes.belongsTo(users, { as: "user", foreignKey: "user_id"});
+  users.hasMany(likes, { as: "likes", foreignKey: "user_id"});
+  likes.belongsTo(posts, { as: "post", foreignKey: "post_id"});
+  posts.hasMany(likes, { as: "likes", foreignKey: "post_id"});
+  posts.belongsTo(users, { as: "user", foreignKey: "user_id"});
+  users.hasMany(posts, { as: "posts", foreignKey: "user_id"});
 
   return {
     comments,

@@ -1,26 +1,49 @@
+// Imports
 const sequelize = require("../db-connection/db-connection");
 const initModels = require("../models/init-models");
 const models = initModels(sequelize);
 const moment = require("moment");
 const fs = require("fs");
 
-const userCheck = (req) => {
+/******************** USER CHECK ******************** /
+ * Returns the user_id of the token sent from the frontend
+ */
+const userIdCheck = (req) => {
   return req.user.user_id;
 }
+/******************** USER CHECK ******************** /
+ * Returns the is_admin of the token sent from the frontend
+ */
+const isAdminCheck = (req) => {
+  return req.user.is_admin;
+}
+/******************** GET PAGINATION ******************** /
+ * Defines what the limit and offset params correspond to
+ * and defines their default value
+ */
 const getPagination = (page, size) => {
   const limit = size ? +size : 2;
   const offset = page ? page * limit : 0;
   return { limit, offset };
 };
+/******************** GET PAGING DATA ******************** /
+ * Defines others names for count and rows
+ * and defines values for currentPage and totalPages
+ */
 const getPagingData = (data, page, limit) => {
   const { count: totalPosts, rows: posts } = data;
   const currentPage = page ? +page : 0;
   const totalPages = Math.ceil(totalPosts / limit);
-
   return { totalPosts, posts, totalPages, currentPage };
 };
 
-// Get all posts and pagination
+
+/******************** GET ALL POSTS ******************** /
+ * Retrieves page and size from req queries and defines limit and offset values from them
+ * Searches for posts with these params, order posts by their date and id
+ * Checks also if there is user_id in req queries, if so, filters posts with these user_id
+ * Then returns the posts
+ */
 exports.getAllPosts = (req, res) => {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
@@ -28,40 +51,32 @@ exports.getAllPosts = (req, res) => {
   models.posts.findAndCountAll({ 
     limit: limit,
     offset: offset,
-    order: [[ "id", "DESC" ]]
+    order: [[ "date", "DESC" ], [ "id", "DESC" ]],
+    where: req.query.user_id ? { user_id: req.query.user_id } : {}
   })
 
-    .then(posts => {
-      if (!posts) {
-        return res.status(404).json({ error: "Aucun post trouvé !" });
-      } else {
-        const response = getPagingData(posts, page, limit)
-        return res.status(200).json(response);
-      }
-    })
+  .then(posts => {
+    if (!posts) {
+      return res.status(404).json({ error: "Aucun post trouvé !" });
+    } else {
+      const response = getPagingData(posts, page, limit)
+      return res.status(200).json(response);
+    }
+  })
 
-    .catch(error => res.status(500).json({ message: error.message }));
+  .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Get all posts of a user
-exports.getAllPostsOfUser = (req, res) => {
-  models.posts.findAll({ where: { user_id: req.params.user_id }, order: [[ "id", "DESC" ]] }) // sort by post date in descending order
 
-    .then(posts => {
-      if (!posts) {
-        return res.status(404).json({ error: "Aucun post trouvé pour cet utilisateur !" });
-      } else {
-        return res.status(200).json(posts);
-      }
-    })
-
-    .catch(error => res.status(500).json({ message: error.message }));
-};
-
-// Create a post
+/******************** CREATE POST ******************** /
+ * Gets the current date
+ * Checks if user sent post_picture or not and defines postObject value
+ * Then checks if the user_id corresponds to an existing user
+ * And creates a new post with postObject content and date
+ */
 exports.createPost = (req, res) => {
   const date = moment(new Date()).format("YYYY-MM-DD");
-  const postObject = req.file ? // check if the request contains a file
+  const postObject = req.file ?
     {
       ...JSON.parse(req.body.post),
       post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -85,39 +100,40 @@ exports.createPost = (req, res) => {
     .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Modify a post
+
+/******************** MODIFY POST ******************** /
+ * Checks if the request contain a post picture or not, then defines postObject value
+ * Then it searches for the post with the id of req params
+ * Then it checks that the user who wants to modify the post is the one who created it or that it's the admin account
+ * Then it checks if request doesn't contain others errors, if so, returns error, if not, update the post
+ */
 exports.modifyPost = (req, res) => {
-  let postObject;
-  const userIdToken = userCheck(req);
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  const postObject = req.file ?
+    {
+      ...JSON.parse(req.body.post),
+      post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...JSON.parse(req.body.post) }
   models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
-    if (post.user_id !== userIdToken && userIdToken !== 74) {
+    // Checks that the user who wants to modify the post is the one who created it or that it's the admin account
+    if (post.user_id !== userIdToken && isAdminToken == false) {
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modification pour ce post !" });
-    } else {
-      postObject = req.file ?
-      {
-        ...JSON.parse(req.body.post),
-        post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-      } : { ...JSON.parse(req.body.post) }
-      return models.posts.findOne({ where: { id: req.params.id } })
-    }
-  })
-
-  .then(post => {
-    if (!post) {
+    } else if (!post) {
       return res.status(404).json({ error: "Modification impossible, ce post n'existe pas !" });
     } else if (!postObject.content) {
-        return res.status(401).json({ error: "Un post doit contenir du texte !" });
+      return res.status(401).json({ error: "Un post doit contenir du texte !" });
     } else if (post.post_picture && req.file) {
-        // if the post already contains a picture and the request contains a file, delete old post picture to replace it by the new one
-        const filename = post.post_picture.split("/images/")[1];
-        fs.unlink(`images/${filename}`, () => {
-          post.update({
-            ...postObject
-          })
-          return res.status(201).json({ message: "Post modifié avec succès !" })
+    // If the post contains a picture and the request contains a file, delete old pic and replace it by the new one
+      const filename = post.post_picture.split("/images/")[1];
+      fs.unlink(`images/${filename}`, () => {
+        post.update({
+          ...postObject
         })
+        return res.status(201).json({ message: "Post modifié avec succès !" })
+      })
     } else {
       post.update({
         ...postObject
@@ -129,13 +145,20 @@ exports.modifyPost = (req, res) => {
   .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Delete a post
+
+/******************** DELETE POST ******************** /
+ * Checks that the user who wants to delete the post is the one who created it or that it's the admin account
+ * Then it searches for the likes of the post and delete them (if there are any)
+ * Then it searches for the comments of the post and delete them (if there are any)
+ * Then it searches for the post by its id, if contains a picture delete it, then delete the post
+ */
 exports.deletePost = (req, res) => {
-  const userIdToken = userCheck(req);
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
   models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
-    if (post.user_id !== userIdToken && userIdToken !== 74) {
+    if (post.user_id !== userIdToken && isAdminToken == false) {
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce post !" });
     } else {
       return models.likes.findAll({ where: { post_id: req.params.id } })
@@ -147,7 +170,7 @@ exports.deletePost = (req, res) => {
       return models.comments.findAll({ where: { post_id: req.params.id } })
     } else {
       for(let like in likes) {
-        likes[like].destroy()
+      likes[like].destroy()
       }
       return models.comments.findAll({ where: { post_id: req.params.id } })
     }
@@ -158,7 +181,7 @@ exports.deletePost = (req, res) => {
       return models.posts.findOne({ where: { id: req.params.id } })
     } else {
       for(let comment in comments) {
-        comments[comment].destroy()
+      comments[comment].destroy()
       }
       return models.posts.findOne({ where: { id: req.params.id } })
     }
@@ -183,7 +206,11 @@ exports.deletePost = (req, res) => {
   .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Get all likes of a post
+
+/******************** GET ALL LIKES OF A POST ******************** /
+ * Checks if the post with this id exists or not,
+ * If so, find all likes for this post
+ */
 exports.getAllLikesOfAPost = (req, res) => {
   models.posts.findOne({ where: { id: req.params.id } })
   .then(post => {
@@ -205,7 +232,12 @@ exports.getAllLikesOfAPost = (req, res) => {
   .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Like a post
+
+/******************** LIKE POST ******************** /
+ * Checks if the user who likes the post exists
+ * Then checks if the post exists
+ * Then creates the like for this post 
+ */
 exports.likePost = (req, res) => {
   models.users.findOne({ where: { id: req.body.user_id } })
 
@@ -232,7 +264,10 @@ exports.likePost = (req, res) => {
   .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Unlike a post
+
+/******************** UNLIKE POST ******************** /
+ * Searches for the like with this user_id and post_id, and if exists, delete it 
+ */
 exports.unlikePost = (req, res) => {
   models.likes.findOne({ where: { post_id: req.params.id, user_id: req.body.user_id } })
 
@@ -248,7 +283,10 @@ exports.unlikePost = (req, res) => {
     .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Get all comments of a post
+
+/******************** GET ALL COMMENTS OF A POST ******************** /
+ * Checks if the post exists, then searches all of comments of this post
+ */
 exports.getAllCommentsOfAPost = (req, res) => {
   models.posts.findOne({ where: { id: req.params.id } })
   .then(post => {
@@ -271,7 +309,11 @@ exports.getAllCommentsOfAPost = (req, res) => {
   
 };
 
-// Comment a post
+
+/******************** COMMENT POST ******************** /
+ * Checks if the user exists, then searches for the post with the id of req params,
+ * If the post exists, create a new comment for it
+ */
 exports.commentPost = (req, res) => {
   models.users.findOne({ where: { id: req.body.user_id } })
 
@@ -301,18 +343,16 @@ exports.commentPost = (req, res) => {
     .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Modify comment of a post
-exports.modifyCommentPost = (req, res) => {
-  const userIdToken = userCheck(req);
-  models.comments.findOne({ where: { id: req.params.comment_id } })
 
-  .then(comment => {
-    if (comment.user_id !== userIdToken && userIdToken !== 74) {
-      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modifications pour ce commentaire !" });
-    } else {
-      return models.posts.findOne({ where: { id: req.params.id } })
-    }
-  })
+/******************** MODIFY COMMENT POST ******************** /
+ * Checks if the post exists, then checks that the user who wants to modify the comment
+ * is the one who created it or that it's the admin account
+ * Then updates the comment
+ */
+exports.modifyCommentPost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
     if (!post) {
@@ -323,7 +363,9 @@ exports.modifyCommentPost = (req, res) => {
   })
 
   .then(comment => {
-    if (!comment) {
+    if (comment.user_id !== userIdToken && isAdminToken == false) {
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modifications pour ce commentaire !" });
+    } else if (!comment) {
       return res.status(404).json({ error: "Modification impossible, ce commentaire n'existe pas !" });
     } else if (!req.body.content) {
       return res.status(401).json({ error: "Un commentaire ne doit pas être vide !" });
@@ -338,18 +380,16 @@ exports.modifyCommentPost = (req, res) => {
     .catch(error => res.status(500).json({ message: error.message }));
 };
 
-// Delete comment of a post
-exports.deleteCommentPost = (req, res) => {
-  const userIdToken = userCheck(req);
-  models.comments.findOne({ where: { id: req.params.comment_id } })
 
-  .then(comment => {
-    if (comment.user_id !== userIdToken && userIdToken !== 74) {
-      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce commentaire !" });
-    } else {
-      return models.posts.findOne({ where: { id: req.params.id } })
-    }
-  })
+/******************** DELETE COMMENT POST ******************** /
+ * Checks if the post exists, then checks that the user who wants to delete the comment
+ * is the one who created it or that it's the admin account
+ * Then deletes the comment
+ */
+exports.deleteCommentPost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
     if (!post) {
@@ -360,7 +400,9 @@ exports.deleteCommentPost = (req, res) => {
   })
 
   .then(comment => {
-    if (!comment) {
+    if (comment.user_id !== userIdToken && isAdminToken == false) {
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce commentaire !" });
+    } else if (!comment) {
       return res.status(404).json({ error: "Suppression impossible, ce commentaire n'existe pas !" });
     } else {
       comment.destroy()
@@ -368,5 +410,5 @@ exports.deleteCommentPost = (req, res) => {
     }
   })
 
-    .catch(error => res.status(500).json({ message: error.message }));
+  .catch(error => res.status(500).json({ message: error.message }));
 };
