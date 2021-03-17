@@ -5,13 +5,13 @@
       <div :class="$style.publication">
         <div :class="$style.publication__user">
           <div :class="$style.publication__user__picture" class="img-container-rounded">
-            <img :src="user.profilePicture" class="img-cover">
+            <img :src="userConnected.profilePicture" class="img-cover">
           </div>
-          <textarea id="post_content" :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ user.firstName ]] + ', que voulez-vous dire ?'"></textarea>
+          <textarea id="post_content" :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ userConnected.firstName ]] + ', que voulez-vous dire ?'"></textarea>
         </div>
         <div :class="$style.publication__buttons">
           <input type="file" id="postPicture" name="postPicture" accept="image/png, image/jpeg" :class="$style.publication__buttons__upload">
-          <button class="btn-secondary-whiteTxt" @click="createPost">Publier</button>
+          <button class="btn-secondary" @click="createPost">Publier</button>
         </div>
       </div>
       <div :class="$style.posts">
@@ -23,14 +23,15 @@
           :date="post.date"
           :content="post.content"
           :postPicture="post.post_picture"
+          :getHomePosts="getHomePosts"
         />
       </div>
       <div :class="$style.pagination">
-        <Page
+        <HomePagination
           v-for="index in Number(totalPages)"
           :key="index"
           :differentPage="index"
-          :getPostsOfThisPage="getPostsOfThisPage"
+          :getHomePosts="getHomePosts"
         />
       </div>
     </div>
@@ -41,7 +42,7 @@
 import axios from "axios"
 import Navigation from "../components/Navigation"
 import Post from "../components/Post"
-import Page from "../components/Page"
+import HomePagination from "../components/HomePagination"
 import { mapState, mapActions } from "vuex"
 
 export default {
@@ -49,7 +50,7 @@ export default {
   components: {
     Navigation,
     Post,
-    Page
+    HomePagination
   },
   data(){
     return{
@@ -60,17 +61,18 @@ export default {
     }
   },
   computed: {
-    ...mapState(["user"])
+    ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["getUserInfos", "resetInfo"]),
+    ...mapActions(["getUserInfos"]),
+
 
     /*************** GET POSTS OF THIS PAGE *************** /
      * This function calls the API to get all posts,
      * stores them in the posts data,
      * and displays them
      */
-    getPostsOfThisPage(){
+    getHomePosts(){
       const currentURL = new URLSearchParams(window.location.search)
       const currentPage = (Number(currentURL.get("page")) - 1)
       axios({
@@ -99,8 +101,8 @@ export default {
     createPost(){
       const formData = new FormData()
       let postInfos = {
-          user_id: localStorage.getItem("userId"),
-          content: document.getElementById("post_content").value
+        user_id: this.userConnected.id,
+        content: document.getElementById("post_content").value
       }
       formData.set("post", JSON.stringify(postInfos))
       if (document.getElementById("postPicture").value !== "") {
@@ -116,7 +118,7 @@ export default {
         data: formData
       })
       .then(() => { 
-        this.getPostsOfThisPage()
+        this.getHomePosts()
         document.getElementById("post_content").value = ""
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
@@ -131,7 +133,7 @@ export default {
    */
   created() {
     this.getUserInfos()
-    this.getPostsOfThisPage()
+    this.getHomePosts()
   }
 }
 </script>

@@ -1,20 +1,20 @@
 <template>
   <div :class="$style.profile">
-    <Navigation></Navigation>
+    <Navigation/>
     <div :class="$style.profile__container">
       <div :class="$style.profile__picture" class="img-container-rounded">
-        <img :src="user.profilePicture" class="img-cover">
+        <img :src="userConnected.profilePicture" class="img-cover">
       </div>
       <h1 :class="$style.profile__fullname">{{ fullName }}</h1>
       <div :class="$style.profile__about">
         <h2 :class="$style.profile__about__title">À propos</h2>
-        <span :class="$style.profile__about__text">{{ user.about }}</span>
+        <span :class="$style.profile__about__text">{{ userConnected.about }}</span>
       </div>
       <div :class="$style.profile__buttons">
         <router-link to="/profile/edit">
-          <button type="button" class="btn-secondary-whiteTxt">Modifier mon profil</button>
+          <button type="button" class="btn-secondary">Modifier mon profil</button>
         </router-link>
-        <button @click="signOut" class="btn-tertiary-whiteTxt">Se déconnecter</button>
+        <button @click="signOut" class="btn-tertiary">Se déconnecter</button>
       </div>
       <h2 :class="$style.profile__posts__title">Derniers Posts</h2>
       <div :class="$style.profile__posts">
@@ -26,9 +26,17 @@
           :date="post.date"
           :content="post.content"
           :postPicture="post.post_picture"
-          :getMyAllPosts="getMyAllPosts"
+          :getProfilePosts="getProfilePosts"
         />
       </div> 
+      <div :class="$style.pagination">
+        <ProfilePagination
+          v-for="index in Number(totalPages)"
+          :key="index"
+          :differentPage="index"
+          :getProfilePosts="getProfilePosts"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -37,49 +45,53 @@
 import axios from "axios"
 import Navigation from "../components/Navigation"
 import Post from "../components/Post"
+import ProfilePagination from "../components/ProfilePagination"
 import { mapState, mapGetters, mapActions } from "vuex"
 
 export default {
   name: "MyProfile",
   components: {
     Navigation,
-    Post
+    Post,
+    ProfilePagination
   },
   data(){
     return{
-      posts: ""
+      posts: "",
+      totalPosts: "",
+      currentPage: "",
+      totalPages: ""
     }
   },
   computed: {
     ...mapGetters(["fullName"]),
-    ...mapState(["user"])
+    ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["getUserInfos","resetInfo", "signOut"]),
+    ...mapActions(["getUserInfos", "signOut"]),
 
-    /*************** GET MY ALL POSTS *************** /
-     * This function calls the API to get all posts of the connected user,
-     * stores them in the posts data,
-     * and displays them
-     */
-    getMyAllPosts(){
+    getProfilePosts() {
+      const currentURL = new URLSearchParams(window.location.search)
+      const currentPage = (Number(currentURL.get("page")) - 1)
       axios({
-      method: "get",
-      url: `http://localhost:3000/api/posts/all/${localStorage.getItem("userId")}`,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
-      }
+        method: "get",
+        url: `http://localhost:3000/api/posts/all?page=${currentPage}&user_id=${this.userConnected.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
       })
       .then(response => { 
-        this.posts = response.data
-      })
-      .catch(error => { 
-        if(error.response) {
-          console.log(error.response.data.error)
+        this.posts = response.data.posts
+        this.totalPosts = response.data.totalPosts
+        this.totalPages = response.data.totalPages
+        this.currentPage = response.data.currentPage
+        if (this.posts == "") {
+          this.$router.push({ name: "MyProfile" })
         }
-      });
-    }
+      })
+      .catch(error => { if(error.response) { console.log(error.response.data.error) }});
+    },
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
@@ -90,7 +102,7 @@ export default {
    */
   created() {
     this.getUserInfos()
-    this.getMyAllPosts()
+    this.getProfilePosts()
   }
 }
 </script>
@@ -146,6 +158,10 @@ export default {
       font-size: 1rem;
     }
   }
+}
+.pagination {
+  display: flex;
+  justify-content: center;
 }
 
 @media (min-width: 480px) {
