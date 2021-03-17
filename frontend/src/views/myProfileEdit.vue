@@ -1,28 +1,28 @@
 <template>
   <div :class="$style.profile">
-    <Navigation></Navigation>
+    <Navigation/>
     <div :class="$style.profile__form">
       <h1>Modifier le profil</h1>
-      <p class="info" v-if="$store.state.info !== null">{{ $store.state.info }}</p>
+      <p class="info" v-if="info !== ''">{{ info }}</p>
       <form>
         <div class="mb-3">
           <label for="firstName" class="form-label">Prénom</label>
-          <input type="text" class="form-control" id="firstName" :value="user.firstName">
+          <input type="text" class="form-control" id="firstName" :value="userConnected.firstName">
         </div>
         <div class="mb-3">
           <label for="lastName" class="form-label">Nom</label>
-          <input type="text" class="form-control" id="lastName" :value="user.lastName">
+          <input type="text" class="form-control" id="lastName" :value="userConnected.lastName">
         </div>
         <div class="mb-3">
           <label for="about" class="form-label">À propos</label>
-          <input type="text" class="form-control" id="about" :value="user.about">
+          <input type="text" class="form-control" id="about" :value="userConnected.about">
         </div>
         <div class="mb-3" :class="$style.profile__form__upload">
           <label for="profilePicture" class="form-label">Choisir une nouvelle photo de profil</label><br>
           <input type="file" id="profilePicture" name="profilePicture" accept="image/png, image/jpeg">
         </div>
-        <button type="button" :class="$style.profile__form__button" class="btn-secondary-whiteTxt" @click="updateProfile">Valider</button>
-        <button type="button" :class="$style.profile__form__button" class="btn-tertiary-whiteTxt" @click="deleteProfile">Supprimer le profil</button>
+        <button type="button" :class="$style.profile__form__button" class="btn-secondary" @click="updateProfile">Valider</button>
+        <button type="button" :class="$style.profile__form__button" class="btn-tertiary" @click="deleteProfile">Supprimer le profil</button>
       </form>
     </div>
   </div>
@@ -31,16 +31,20 @@
 <script>
 import axios from "axios"
 import Navigation from "../components/Navigation"
-import { mapState, mapGetters, mapActions } from "vuex"
+import { mapState, mapActions } from "vuex"
 
 export default {
   name: "MyProfileEdit",
   components: {
     Navigation
   },
+  data() {
+    return {
+      info: ""
+    }
+  },
   computed: {
-    ...mapGetters(["fullName"]),
-    ...mapState(["user"])
+    ...mapState(["userConnected"])
   },
   methods: {
     ...mapActions(["getUserInfos", "resetInfo"]),
@@ -64,7 +68,7 @@ export default {
       }
       axios({
         method: "put",
-        url: `http://localhost:3000/api/users/${localStorage.getItem("userId")}`,
+        url: `http://localhost:3000/api/users/${this.userConnected.id}`,
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -72,10 +76,10 @@ export default {
         data: formData
       })
       .then(response => { 
-        this.$store.state.info = `${response.data.message}`
-        setTimeout(() => this.$router.push({ name: "MyProfile" }), 1000)
+        this.info = `${response.data.message}`
+        setTimeout(() => this.$router.push({ path: "/profile?page=1" }), 1000)
       })
-      .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
+      .catch(error => { if(error.response) { this.info = error.response.data.error }});
     },
 
     /*************** DELETE PROFILE *************** /
@@ -85,16 +89,16 @@ export default {
     deleteProfile() {
       axios({
         method: "delete",
-        url: `http://localhost:3000/api/users/${localStorage.getItem("userId")}`,
+        url: `http://localhost:3000/api/users/${this.userConnected.id}`,
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       })
       .then(response => { 
-        this.$store.state.info = `${response.data.message}`
+        this.info = `${response.data.message}`
         setTimeout(() => this.$router.push({ name: "Login" }), 1000)
       })
-      .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
+      .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
   },
 
@@ -102,13 +106,9 @@ export default {
    * It calls the getUserInfos function (stored in vuex actions)
    * to get the information (first name, last name, profile picture and about)
    * of the connected user and store them as vuex states
-   * It also calls the resetInfo function (stored in vuex actions),
-   * to delete the value of info state,
-   * to not display the error of success message of others pages
    */
   created() {
     this.getUserInfos()
-    this.resetInfo()
   }
 }
 </script>

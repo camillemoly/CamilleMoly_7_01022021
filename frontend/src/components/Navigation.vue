@@ -1,13 +1,13 @@
 <template>
   <nav :class="$style.nav">
     <div :class="$style.nav__left">
-      <router-link to="/"><img :class="$style.nav__left__logo" src="../assets/cut-logo.png"></router-link>
+      <router-link to="/?page=1"><img :class="$style.nav__left__logo" src="../assets/cut-logo.png"></router-link>
       <input :class="$style.nav__left__search" placeholder="Rechercher...">
     </div>
     <div :class="$style.nav__profile">
-      <router-link to="/profile">
+      <router-link to="/profile?page=1">
         <div :class="$style.nav__profile__container" class="img-container-rounded">
-          <img class="img-cover" :src="user.profilePicture">
+          <img :src="userConnected.profilePicture" class="img-cover">
         </div>
       </router-link>
     </div>
@@ -20,7 +20,7 @@ import { mapState } from "vuex"
 export default {
   name: 'Navigation',
   computed: {
-    ...mapState(["user"])
+    ...mapState(["userConnected"])
   }
 }
 </script>

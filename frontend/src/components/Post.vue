@@ -2,24 +2,24 @@
   <div :class="$style.post">
 
     <!-- Setting button -->
-    <div v-if="postUserId == userConnected || adminId == userConnected" :class="$style.post__settings" class="dropright">
-      <button class="btn-primary-whiteTxt" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div v-if="postUserId == userConnected.id || userConnected.isAdmin == true" :class="$style.post__settings" class="dropright">
+      <button class="btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a @click="postIsEditing = true" class="dropdown-item" :class="$style.post__settings__edit">Modifier</a>
-        <a @click="deletePost" class="dropdown-item" :class="$style.post__settings__delete">Supprimer</a>
+        <a @click="postIsEditing = true" :class="$style.post__settings__edit" class="dropdown-item">Modifier</a>
+        <a @click="deletePost" :class="$style.post__settings__delete" class="dropdown-item">Supprimer</a>
       </div>
     </div>
 
     <!-- User profile picture, fullname and post date -->
     <div :class="$style.post__user">
       <div :class="$style.post__user__picture" class="img-container-rounded">
-        <img :src="user.profile_picture" class="img-cover" />
+        <img :src="postUser.profile_picture" class="img-cover" />
       </div>
       <div :class="$style.post__user__infos">
         <p :class="$style.post__user__infos__name">
-          {{ user.first_name }} {{ user.last_name }}
+          {{ postUser.first_name }} {{ postUser.last_name }}
         </p>
         <p :class="$style.post__user__infos__date">{{ date }}</p>
       </div>
@@ -31,28 +31,28 @@
     <div v-show="postIsEditing == false" :class="$style.post__buttons">
 
       <!-- Like button when the post is not liked -->
-      <button v-show="postIsLiked == false" class="btn-primary-whiteTxt like" @click="likePost">
+      <button v-show="postIsLiked == false" @click="likePost" class="btn-primary like">
         <span v-show="likes.length > 0">{{ likes.length }} </span>
         <span v-show="likes.length == 0"> J'aime </span>
         <i class="fas fa-thumbs-up"></i>
       </button>
       <!-- Like button when the post is liked -->
-      <button v-show="postIsLiked" class="btn-secondary-whiteTxt like" @click="unlikePost">
+      <button v-show="postIsLiked" @click="unlikePost" class="btn-secondary like">
         <span v-show="likes.length > 0">{{ likes.length }} </span>
         <span v-show="likes.length == 0"> J'aime </span>
         <i class="fas fa-thumbs-up"></i>
       </button>
-      <button class="btn-primary-whiteTxt" @click="showHideComments">
+      <button @click="showHideComments" class="btn-primary">
         <span>Commenter</span>
       </button>
-      <span v-show="comments.length > 0" @click="showHideComments" :class="$style.post__comments__number">{{ comments.length }} commentaire<span v-show="comments.length > 1">s</span></span>
+      <button v-show="comments.length > 0" @click="showHideComments" :class="$style.post__comments__number">{{ comments.length }} commentaire<span v-show="comments.length > 1">s</span></button>
     </div>
 
     <!-- Comments area -->
     <div v-show="showComments && postIsEditing == false" :class="$style.post__comments">
       <div :class="$style.post__comments__area">
         <textarea :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici..."></textarea>
-        <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary-whiteTxt">
+        <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary">
           <i class="fab fa-telegram-plane"></i>
         </button>
       </div>
@@ -64,15 +64,14 @@
         :commentPostId="comment.post_id"
         :content="comment.content"
         :getAllCommentsOfAPost="getAllCommentsOfAPost"
-        :userConnected="userConnected"
       />
     </div>
 
     <!-- Content, post picture and button when the post is editing -->
     <input v-show="postIsEditing" :id="'editPostContent' + [[ postId ]]" :class="$style.post__content" :value="content"/>
     <div v-show="postIsEditing" :class="$style.post__buttons">
-      <input type="file" :id="'editPostPicture' + [[ postId ]]" name="postPicture" accept="image/png, image/jpeg">
-      <button class="btn-secondary-whiteTxt" @click="updatePost">Valider</button>
+      <input :id="'editPostPicture' + [[ postId ]]" type="file" name="postPicture" accept="image/png, image/jpeg">
+      <button @click="updatePost" class="btn-secondary">Valider</button>
     </div>
   </div>
 </template>
@@ -84,33 +83,33 @@ import { mapState } from "vuex"
 
 export default {
   name: "Post",
-  props: ["postId", "postUserId", "date", "content", "postPicture", "getAllPosts", "getMyAllPosts"],
+  props: ["postId", "postUserId", "date", "content", "postPicture", "getHomePosts", "getProfilePosts"],
   components: {
     Comment
   },
   data() {
     return {
-      user: "",
+      postUser: "",
       likes: "",
       comments: "",
-      userConnected: localStorage.getItem("userId"),
       postIsEditing: false,
       postIsLiked: false,
       showComments: false
     }
   },
   computed: {
-    ...mapState(["adminId"])
+    ...mapState(["userConnected"])
   },
   methods: {
 
 /************************************************************* POSTS *************************************************************/
 
     /********************* UPDATE POST ********************* /
-     * This function creates formData object, with new content,
-     * and check if the user adds a file and if so, adds it to the formData
+     * Creates formData object with new content and check if the user adds a file
+     * if so, adds it to the formData
      * Then it calls the API to update the post,
-     * and calls function to update the post visually without reloading the page
+     * passes the postIsEditing to false to display <p> content instead of <input>
+     * and calls function to update posts feed without reloading the page
      */
     updatePost() {
       const formData = new FormData()
@@ -132,21 +131,21 @@ export default {
         data: formData
       })
 
-      .then(() => { 
+      .then(() => {
         this.postIsEditing = false
-        if (this.$route.name == 'Home') {
-          this.getAllPosts()
-        } else if (this.$route.name == 'MyProfile') {
-          this.getMyAllPosts()
+        if (this.$route.name === "Home") {
+          this.getHomePosts()
+        } else if (this.$route.name === "MyProfile") {
+          this.getProfilePosts()
         }
       })
 
-      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+      .catch(error => { if (error.response) { console.log(error.response.data.error) }});
     },
 
     /********************* DELETE POST ********************* /
-     * The function calls the API to delete the post
-     * Then it calls function to update visually the news feed without reloading the page
+     * Calls the API to delete the post
+     * then calls function to update posts feed without reloading the page
      */
     deletePost() {
       axios({
@@ -158,21 +157,22 @@ export default {
       })
 
       .then(() => {
-        if (this.$route.name == 'Home') {
-          this.getAllPosts()
-        } else if (this.$route.name == 'MyProfile') {
-          this.getMyAllPosts()
+        if (this.$route.name === "Home") {
+          this.getHomePosts()
+        } else if (this.$route.name === "MyProfile") {
+          this.getProfilePosts()
         }
       })
       
-      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+      .catch(error => { if (error.response) { console.log(error.response.data.error) }});
     },
 
 /************************************************************* LIKES *************************************************************/
 
     /********************* GET ALL LIKES OF A POST ********************* /
-     * This function calls the API to get all the likes of the function,
-     * then it stores them to likes data
+     * Calls the API to get all the likes of the post then it stores them to likes data
+     * it also checks if there is the user_id of the user connected
+     * if so, it passes the postIsLiked to true (to define post as liked)
      */
     getAllLikesOfAPost() {
       axios({
@@ -186,7 +186,7 @@ export default {
       .then(response => {
         this.likes = response.data
         for (let like in this.likes) {
-          if (this.likes[like].user_id == localStorage.getItem("userId")) {
+          if (this.likes[like].user_id == this.userConnected.id) {
             this.postIsLiked = true
           }
         }
@@ -196,8 +196,8 @@ export default {
     },
 
     /********************* LIKE POST ********************* /
-     * The function calls the API to create the like of the post,
-     * then it passes the postIsLiked to TRUE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
+     * Calls the API to create the like of the post,
+     * then passes the postIsLiked to true and push new like to likes array (+1 like)
      */
     likePost() {
       axios({
@@ -208,21 +208,21 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(localStorage.getItem("userId"))
+          user_id: Number(this.userConnected.id)
         }
       })
 
       .then(() => {
         this.postIsLiked = true
-        this.likes.push(`like of ${localStorage.getItem("userId")}`)
+        this.likes.push(`like of ${this.userConnected.id}`)
       })
 
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
     /********************* UNLIKE POST ********************* /
-     * The function calls the API to delete the like of the post,
-     * then it passes the postIsLiked to FALSE and calls functions to update posts (getAllPost or getMyAllPost) and likes (checkIfUserLiked)
+     * Calls the API to delete the like of the post,
+     * then passes the postIsLiked to false and pop the like from likes array (-1 like)
      */
     unlikePost() {
       axios({
@@ -233,21 +233,22 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(localStorage.getItem("userId"))
+          user_id: Number(this.userConnected.id)
         }
       })
 
       .then(() => {
         this.postIsLiked = false
-        this.likes.pop(`like of ${localStorage.getItem("userId")}`)
+        this.likes.pop(`like of ${this.userConnected.id}`)
       })
 
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
 /*********************************************************** COMMENTS ************************************************************/
-    /********************* GET ALL COMMENTS OF A POST ********************* /
-     * 
+
+    /********************* SHOW HIDE COMMENTS ********************* /
+     * Show or hide comments section depending of its state
      */
     showHideComments() {
       if (this.showComments == false) {
@@ -258,7 +259,7 @@ export default {
     },
 
     /********************* GET ALL COMMENTS OF A POST ********************* /
-     * 
+     * Calls the API to get all comment of a post and store them to the comments data
      */
     getAllCommentsOfAPost() {
       axios({
@@ -277,7 +278,9 @@ export default {
     },
 
     /********************* COMMENT POST ********************* /
-     * 
+     * Calls the API to create a comment of a post with user_id and content,
+     * then calls the function to update comment feed without reloading
+     * and empty input value
      */
     commentPost() {
       axios({
@@ -288,7 +291,7 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(localStorage.getItem("userId")),
+          user_id: Number(this.userConnected.id),
           content: document.getElementById(`commentInput` + this.postId).value
         }
       })
@@ -302,8 +305,9 @@ export default {
   },
 
   /************** WHEN THE COMPONENT IS CREATED (BEFORE MOUNTED) ************** /
-   * It calls the API to get the user information who created the post,
-   * to get his profile picture and full name, and stock them to user data
+   * Calls the API to get the user information who created the post,
+   * to get his profile picture and full name, and stores them to user data
+   * Then it calls function to display likes and comments
    */
   created() {
     axios({
@@ -315,12 +319,12 @@ export default {
     })
 
     .then((response) => {
-      this.user = response.data
+      this.postUser = response.data
       this.getAllLikesOfAPost()
       this.getAllCommentsOfAPost()
     })
     
-    .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+    .catch(error => { if (error.response) { console.log(error.response.data.error) }});
   }
 };
 </script>
@@ -394,9 +398,13 @@ export default {
     text-align: center;
     &__number{
       margin: 5px;
+      border: none;
       font-weight: bold;
       color: $color-primary;
-      cursor: pointer;
+      background-color: white;
+      &:focus {
+        outline: none;
+      }
     }
     &__area {
       display: flex;

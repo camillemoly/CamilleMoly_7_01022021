@@ -5,31 +5,31 @@
     </div>
     <form :class="$style.auth__form">
       <h1 :class="$style.auth__form__title">{{ form.typeOfAuth }}</h1>
-      <p class="info" v-if="info !== null">{{ info }}</p>
-      <div class="mb-3" v-if="$route.name == 'Signup'"> <!-- display only on signup page -->
+      <p v-if="info !== ''" class="info">{{ info }}</p>
+      <div v-if="$route.name == 'Signup'" class="mb-3"> <!-- display only on signup page -->
         <label for="firsName" class="form-label">Prénom</label>
-        <input type="text" class="form-control" id="firstName">
+        <input id="firstName" type="text" class="form-control">
       </div>
-      <div class="mb-3" v-if="$route.name == 'Signup'"> <!-- display only on signup page -->
+      <div v-if="$route.name == 'Signup'" class="mb-3"> <!-- display only on signup page -->
         <label for="lastName" class="form-label">Nom</label>
-        <input type="text" class="form-control" id="lastName">
+        <input id="lastName" type="text" class="form-control">
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email">
+        <input id="email" type="email" class="form-control">
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Mot de passe</label>
-        <input type="password" class="form-control" id="password">
+        <input id="password" type="password" class="form-control">
       </div>
       <div class="mb-3 form-check">
-        <input type="checkbox" @click="showPassword" class="form-check-input" id="showHide">
+        <input @click="showPassword" id="showHide" type="checkbox" class="form-check-input">
         <label class="form-check-label" for="showHide">Afficher/masquer</label>
       </div>
-      <button type="button" class="btn-secondary-whiteTxt" @click="auth">{{ form.authBtn }}</button>
+      <button @click="auth" type="button" class="btn-secondary">{{ form.authBtn }}</button>
       <p :class="$style.auth__form__question">{{ form.question }}</p>
       <router-link :to="form.routerLink">
-        <button type="button" class="btn-secondary-whiteTxt">{{ form.questionBtn }}</button>
+        <button type="button" class="btn-secondary">{{ form.questionBtn }}</button>
       </router-link>
     </form>
   </div>
@@ -42,8 +42,7 @@ export default {
   methods: {
 
     /*************** SHOW PASSWORD *************** /
-     * This function changes type of the password input
-     * to show or hide the password
+     * This function changes type of the password input to show or hide the password
      */
     showPassword() {
       var x = document.getElementById("password");

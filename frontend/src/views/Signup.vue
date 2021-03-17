@@ -1,6 +1,6 @@
 <template>
   <div class="signup">
-    <Authentication :form="form" :info="$store.state.info" :auth="signup"/>
+    <Authentication :form="form" :info="info" :auth="signup"/>
   </div>
 </template>
 
@@ -21,7 +21,8 @@ export default {
         question: "Déjà un compte ?",
         routerLink: "/login",
         questionBtn: "Se connecter"
-      }
+      },
+      info: ""
     }
   },
   methods: {
@@ -46,10 +47,10 @@ export default {
         }
       })
       .then(response => { 
-        this.$store.state.info = `${response.data.message} Redirection vers la page de connexion...`
+        this.info = `${response.data.message} Redirection vers la page de connexion...`
         setTimeout(() => this.$router.push({ name: "Login" }), 1500)
       })
-      .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
+      .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
   }
 }

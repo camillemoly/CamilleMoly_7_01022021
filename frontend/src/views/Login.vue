@@ -1,13 +1,13 @@
 <template>
   <div class="login">
-    <Authentication :form="form" :info="$store.state.info" :auth="login"/>
+    <Authentication :form="form" :info="info" :auth="login"/>
   </div>
 </template>
 
 <script>
 import axios from "axios"
 import Authentication from "../components/Authentication"
-import { mapActions } from "vuex"
+import { mapState } from "vuex"
 
 export default {
   name: "Login",
@@ -22,11 +22,14 @@ export default {
         question: "Pas encore inscrit ?",
         routerLink: "/signup",
         questionBtn: "S'inscrire"
-      }
+      },
+      info: ""
     }
   },
+  computed: {
+    ...mapState(["userConnected"])
+  },
   methods: {
-    ...mapActions(["resetInfo"]),
 
     /********************* LOGIN ********************* /
      * This function calls the API to connect the user,
@@ -47,22 +50,13 @@ export default {
         }
       })
       .then(response => { 
-        this.$store.state.info = `${response.data.message} Redirection vers la page d'accueil...`
+        this.info = `${response.data.message} Redirection vers la page d'accueil...`
         localStorage.setItem("userId", response.data.user_id)
         localStorage.setItem("token", response.data.token)
         setTimeout(() => this.$router.push({ path: "/", query: { page: 1 } } ), 1500)
       })
-      .catch(error => { if(error.response) { this.$store.state.info = error.response.data.error }});
+      .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
-  },
-
-  /*************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) *************** /
-   * It calls the resetInfo function (stored in vuex actions),
-   * to delete the value of info state,
-   * to not display the error of success message of signup page
-   */
-  created(){
-    this.resetInfo()
   }
 }
 </script>

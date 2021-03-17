@@ -2,32 +2,32 @@
   <div :class="$style.comment">
 
     <!-- Setting button -->
-    <div v-if="commentUserId == userConnected || adminId == userConnected" :class="$style.comment__settings" class="dropright">
-      <button class="btn-primary-whiteTxt " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div v-if="commentUserId == userConnected.id || userConnected.isAdmin == true" :class="$style.comment__settings" class="dropright">
+      <button class="btn-primary " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a @click="commentIsEditing = true" class="dropdown-item" :class="$style.comment__settings__edit">Modifier</a>
-        <a @click="deleteComment" class="dropdown-item" :class="$style.comment__settings__delete">Supprimer</a>
+        <a @click="commentIsEditing = true" :class="$style.comment__settings__edit" class="dropdown-item">Modifier</a>
+        <a @click="deleteComment" :class="$style.comment__settings__delete" class="dropdown-item">Supprimer</a>
       </div>
     </div>
 
     <!-- User profile picture, fullname -->
     <div :class="$style.comment__user">
       <div :class="$style.comment__user__picture" class="img-container-rounded">
-        <img :src="user.profile_picture" class="img-cover" />
+        <img :src="commentUser.profile_picture" class="img-cover" />
       </div>
       <p :class="$style.comment__user__name">
-        {{ user.first_name }} {{ user.last_name }}
+        {{ commentUser.first_name }} {{ commentUser.last_name }}
       </p>
     </div>
 
     <!-- Content when the comment is not editing -->
     <p v-show="commentIsEditing == false" :class="$style.comment__content">{{ content }}</p>
 
-    <!-- Content when the post is editing -->
+    <!-- Content when the comment is editing -->
     <input v-show="commentIsEditing" :id="'editCommentContent' + [[ commentId ]]" :class="$style.comment__content__editInput" :value="content"/>
-    <button v-show="commentIsEditing" :class="$style.comment__content__editButton" class="btn-secondary-whiteTxt" @click="updateComment">Valider</button>
+    <button v-show="commentIsEditing"  @click="updateComment" :class="$style.comment__content__editButton" class="btn-secondary">Valider</button>
 
   </div>
 </template>
@@ -38,20 +38,22 @@ import { mapState } from "vuex"
 
 export default {
   name: "Comment",
-  props: ["commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost", "userConnected"],
+  props: ["commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost"],
   data() {
     return {
-      user: "",
+      commentUser: "",
       commentIsEditing: false
     }
   },
   computed: {
-    ...mapState(["adminId"])
+    ...mapState(["userConnected"])
   },
   methods: {
 
     /******************** UPDATE COMMENT ******************** /
-     * 
+     * Calls the API to modify the comment with the new value of editCommentContent input
+     * then passes commentIsEditing to false to display <p> instead of <input>
+     * and calls getAllCommentsOfAPost() to update comments feed without reloading
      */
     updateComment() {
       axios({
@@ -66,16 +68,18 @@ export default {
         }
       })
 
-      .then(() => { // TODO: Si on edit le post ou que l'on ferme la partie comment, il faut faire this.commentIsEditing = false également
+      .then(() => {
         this.commentIsEditing = false
         this.getAllCommentsOfAPost()
       })
 
-      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+      .catch(error => { if (error.response) { console.log(error.response.data.error) }});
 
     },
+
     /******************** DELETE COMMENT ******************** /
-     * 
+     * Calls the API to delete the comment
+     * then calls getAllCommentsOfAPost() to update comments feed without reloading
      */
     deleteComment() {
       axios({
@@ -90,13 +94,13 @@ export default {
         this.getAllCommentsOfAPost()
       })
 
-      .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+      .catch(error => { if (error.response) { console.log(error.response.data.error) }});
     }
   },
 
   /************** WHEN THE COMPONENT IS CREATED (BEFORE MOUNTED) ************** /
-   * It calls the API to get the user information who created the comment,
-   * to get his profile picture and full name, and stock them to user data
+   * Calls the API to get the user information who created the comment
+   * to get his profile picture and full name, and stores them to user data
    */
   created() {
     axios({
@@ -108,10 +112,10 @@ export default {
     })
 
     .then((response) => {
-      this.user = response.data
+      this.commentUser = response.data
     })
     
-    .catch((error) => { if (error.response) { console.log(error.response.data.error) }});
+    .catch(error => { if (error.response) { console.log(error.response.data.error) }});
   }
 }
 </script>
