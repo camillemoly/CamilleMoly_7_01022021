@@ -1,9 +1,9 @@
 // Imports
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+require("dotenv").config(); // require the SECRET KEY 
 const sequelize = require("../db-connection/db-connection");
-var initModels = require("../models/init-models");
+var initModels = require("../models/init-models"); // require models to use affected methods
 var models = initModels(sequelize);
 
 // Validators and regex
@@ -14,7 +14,7 @@ passwordSchema
   .is()
   .min(8)
   .is()
-  .max(50)
+  .max(16)
   .has()
   .uppercase()
   .has()
@@ -30,24 +30,32 @@ const numberValidator = new RegExp(/\d/);
 const symbolsValidator = new RegExp(/^[^@&"()!_$*€£`+=\/;?#]+$/);
 const whitespaceValidator = new RegExp(/^\s+$/);
 
-/** SIGNUP
- * This function creates a new user,
- * returns an error if a field doesn't match or if an account already exists with the email,
- * otherwise returns a success message
+
+/******************** SIGNUP ******************** /
+ * Creates a new user in the users table of the database,
+ * returns an error if a field doesn't match with validators
+ * or if an account already exists with the email,
+ * otherwise hash the password and create a new user with request and default values
  */
 exports.signup = (req, res) => {
+  // Empty fields
   if (!req.body.email || !req.body.password || !req.body.first_name || !req.body.last_name) {
     return res.status(401).json({ error: "Tous les champs sont requis !" });
+  // First and last name fields with spaces
   } else if (whitespaceValidator.test(req.body.first_name) || whitespaceValidator.test(req.body.last_name)) {
     return res.status(401).json({ error: "Les champs prénom et nom ne doivent pas contenir uniquement des espaces !" });
+  // First and last name fields with numbers
   } else if (numberValidator.test(req.body.first_name) || numberValidator.test(req.body.last_name)) {
     return res.status(401).json({ error: "Les champs prénom et nom ne doivent pas contenir de chiffres !" });
+  // First and last name fields with symbols
   } else if (!symbolsValidator.test(req.body.first_name) || !symbolsValidator.test(req.body.last_name)) {
     return res.status(401).json({ error: "Les champs prénom et nom ne doivent pas contenir de caractères spéciaux !" });
+  // Email as xxxxxxxxx@xxx.xxx
   } else if (!emailValidator.validate(req.body.email)) {
     return res.status(401).json({ error: "Email non valide !" });
+  // Password with min 8 & max 16 chars, including 1 uppercase, 1 lowercase, 1 number and 1 symbol
   } else if (!passwordSchema.validate(req.body.password)) {
-    return res.status(401).json({ error: "Mot de passe incorrect ! Le mot de passe doit contenir au moins 8 caractères dont une majuscule, une minuscule, un chiffre et un symbole." });
+    return res.status(401).json({ error: "Le mot de passe doit avoir une longueur comprise entre 8 et 16 caractères et contenir au moins une majuscule, une minuscule, un chiffre et un symbole." });
   } else {
     models.users.findOne({ where: { email: req.body.email } })
 
@@ -60,7 +68,7 @@ exports.signup = (req, res) => {
     })
 
     .then(hash => {
-      const user = models.users.create({ // create a new user
+      const user = models.users.create({
         email: String(req.body.email),
         password: String(hash),
         first_name: String(req.body.first_name),
@@ -75,10 +83,11 @@ exports.signup = (req, res) => {
 
     .catch(error => res.status(500).json({ message: error.message }));
   }
-}
+};
 
-/** LOGIN
- * This function connect the user,
+
+/******************** LOGIN ******************** /
+ * Connects the user with his email and password,
  * returns an error if the email doesn't correspond to any account or if the password is incorrect,
  * otherwise returns his id, a token and a success message
  */
@@ -86,28 +95,31 @@ exports.login = (req, res) => {
   let user;
   models.users.findOne({ where: { email: req.body.email } }) // check if the email corresponds to an account
   
-    .then(userRes => {
-      user = userRes;
-      if (!user) {
-        return res.status(404).json({ error: "Aucun compte ne correspond à l'email renseigné !" });
-      }
-      return bcrypt.compare(req.body.password, user.password) // compare the password with the account password
-    })
+  .then(userRes => {
+    user = userRes;
+    if (!user) {
+      return res.status(404).json({ error: "Aucun compte ne correspond à l'email renseigné !" });
+    }
+    return bcrypt.compare(req.body.password, user.password) // compare the password with the account password
+  })
 
-    .then(valid => {
-      if (!valid) {
-        return res.status(401).json({ error: "Mot de passe incorrect !" });
-      }
-      return res.status(200).json({
-        user_id: user.id,
-        token: jwt.sign(
-          { user_id: user.id },
-          process.env.SECRET_KEY,
-          { expiresIn: "24h" }
-        ),
-        message: "Utilisateur connecté !"
-      });
-    })
+  .then(valid => {
+    if (!valid) {
+      return res.status(401).json({ error: "Mot de passe incorrect !" });
+    }
+    return res.status(200).json({
+      user_id: user.id,
+      token: jwt.sign(
+        { 
+          user_id: user.id,
+          is_admin: user.is_admin
+        },
+        process.env.SECRET_KEY,
+        { expiresIn: "24h" }
+      ),
+      message: "Utilisateur connecté !"
+    });
+  })
 
-    .catch(error => res.status(500).json({ message: error.message }));
+  .catch(error => res.status(500).json({ message: error.message }));
 };
