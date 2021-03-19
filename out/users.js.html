@@ -1,10 +1,38 @@
-/*********************************** IMPORTS ***********************************/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: users.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: users.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*********************************** IMPORTS ***********************************/
 
 const sequelize = require("../db-connection/db-connection");
 const initModels = require("../models/init-models");
 const models = initModels(sequelize);
 const numberValidator = new RegExp(/\d/);
-const symbolsValidator = new RegExp(/^[^@&"()!_$*€£`+=\/;?#]+$/);
+const symbolsValidator = new RegExp(/^[^@&amp;"()!_$*€£`+=\/;?#]+$/);
 const whitespaceValidator = new RegExp(/^\s+$/);
 const fs = require("fs");
 
@@ -88,7 +116,7 @@ exports.modifyUser = (req, res) => {
   models.users.findOne({ where: { id: req.params.id } })
   
   .then(user => {
-    if (user.id !== userIdToken && isAdminToken == false) { // only the owner of the profile and an admin can modify the profile
+    if (user.id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the profile and an admin can modify the profile
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modification pour ce profil !" });
     } else if (!user) {
       return res.status(404).json({ error: "Modification impossible, cet utilisateur n'existe pas !" })
@@ -134,7 +162,7 @@ exports.deleteUser = (req, res) => {
   models.users.findOne({ where: { id: req.params.id } })
 
   .then(user => {
-    if (user.id !== userIdToken && isAdminToken == false) { // only the owner of the profile and an admin can delete the profile
+    if (user.id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the profile and an admin can delete the profile
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce profil !" });
     } else { 
       return models.likes.findAll({ where: { user_id: req.params.id } })
@@ -185,17 +213,39 @@ exports.deleteUser = (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "Suppression impossible, cet utilisateur n'existe pas !" });
     }
-    if (user.profile_picture !== "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?b=1&k=6&m=1223671392&s=612x612&w=0&h=5VMcL3a_1Ni5rRHX0LkaA25lD_0vkhFsb1iVm1HKVSQ=") { // if the user has a profile picture, delete it
+    if (user.profile_picture !== "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?b=1&amp;k=6&amp;m=1223671392&amp;s=612x612&amp;w=0&amp;h=5VMcL3a_1Ni5rRHX0LkaA25lD_0vkhFsb1iVm1HKVSQ=") { // if the user has a profile picture, delete it
       const filename = user.profile_picture.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
         user.destroy()
         return res.status(200).json({ message: "Utilisateur supprimé !" })
       })
-    } else if (user.profile_picture == "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?b=1&k=6&m=1223671392&s=612x612&w=0&h=5VMcL3a_1Ni5rRHX0LkaA25lD_0vkhFsb1iVm1HKVSQ=") {
+    } else if (user.profile_picture == "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?b=1&amp;k=6&amp;m=1223671392&amp;s=612x612&amp;w=0&amp;h=5VMcL3a_1Ni5rRHX0LkaA25lD_0vkhFsb1iVm1HKVSQ=") {
       user.destroy()
       return res.status(200).json({ message: "Utilisateur supprimé !" })
     }
   })
 
   .catch(error => res.status(500).json({ message: error.message }));
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#commentPost">commentPost</a></li><li><a href="global.html#createPost">createPost</a></li><li><a href="global.html#deleteCommentPost">deleteCommentPost</a></li><li><a href="global.html#deletePost">deletePost</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#getAllCommentsOfAPost">getAllCommentsOfAPost</a></li><li><a href="global.html#getAllLikesOfAPost">getAllLikesOfAPost</a></li><li><a href="global.html#getAllPosts">getAllPosts</a></li><li><a href="global.html#getOneUser">getOneUser</a></li><li><a href="global.html#getPagination">getPagination</a></li><li><a href="global.html#getPagingData">getPagingData</a></li><li><a href="global.html#isAdminCheck">isAdminCheck</a></li><li><a href="global.html#likePost">likePost</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#modifyCommentPost">modifyCommentPost</a></li><li><a href="global.html#modifyPost">modifyPost</a></li><li><a href="global.html#modifyUser">modifyUser</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#unlikePost">unlikePost</a></li><li><a href="global.html#userIdCheck">userIdCheck</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Mar 19 2021 11:23:58 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

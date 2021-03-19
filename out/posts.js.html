@@ -1,4 +1,32 @@
-/*********************************** IMPORTS ***********************************/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: posts.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: posts.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*********************************** IMPORTS ***********************************/
 
 const sequelize = require("../db-connection/db-connection");
 const initModels = require("../models/init-models");
@@ -138,13 +166,13 @@ exports.modifyPost = (req, res) => {
   models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
-    if (post.user_id !== userIdToken && isAdminToken == false) { // only the owner of the post and admin can modify the post
+    if (post.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the post and admin can modify the post
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modification pour ce post !" });
     } else if (!post) {
       return res.status(404).json({ error: "Modification impossible, ce post n'existe pas !" });
     } else if (!postObject.content) {
       return res.status(401).json({ error: "Un post doit contenir du texte !" });
-    } else if (post.post_picture && req.file) {
+    } else if (post.post_picture &amp;&amp; req.file) {
     // If the post contains a picture and the request contains a file, delete old pic and replace it by the new one
       const filename = post.post_picture.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
@@ -179,7 +207,7 @@ exports.deletePost = (req, res) => {
   models.posts.findOne({ where: { id: req.params.id } })
 
   .then(post => {
-    if (post.user_id !== userIdToken && isAdminToken == false) { // only the owner of the post and admin can delete the post
+    if (post.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the post and admin can delete the post
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce post !" });
     } else {
       return models.likes.findAll({ where: { post_id: req.params.id } })
@@ -410,7 +438,7 @@ exports.modifyCommentPost = (req, res) => {
   })
 
   .then(comment => {
-    if (comment.user_id !== userIdToken && isAdminToken == false) { // only the owner of the comment and admin can modify the comment
+    if (comment.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the comment and admin can modify the comment
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modifications pour ce commentaire !" });
     } else if (!comment) {
       return res.status(404).json({ error: "Modification impossible, ce commentaire n'existe pas !" });
@@ -450,7 +478,7 @@ exports.deleteCommentPost = (req, res) => {
   })
 
   .then(comment => {
-    if (comment.user_id !== userIdToken && isAdminToken == false) { // only the owner of the comment and admin can delete the comment
+    if (comment.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the comment and admin can delete the comment
       return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce commentaire !" });
     } else if (!comment) {
       return res.status(404).json({ error: "Suppression impossible, ce commentaire n'existe pas !" });
@@ -461,4 +489,26 @@ exports.deleteCommentPost = (req, res) => {
   })
 
   .catch(error => res.status(500).json({ message: error.message }));
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#commentPost">commentPost</a></li><li><a href="global.html#createPost">createPost</a></li><li><a href="global.html#deleteCommentPost">deleteCommentPost</a></li><li><a href="global.html#deletePost">deletePost</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#getAllCommentsOfAPost">getAllCommentsOfAPost</a></li><li><a href="global.html#getAllLikesOfAPost">getAllLikesOfAPost</a></li><li><a href="global.html#getAllPosts">getAllPosts</a></li><li><a href="global.html#getOneUser">getOneUser</a></li><li><a href="global.html#getPagination">getPagination</a></li><li><a href="global.html#getPagingData">getPagingData</a></li><li><a href="global.html#isAdminCheck">isAdminCheck</a></li><li><a href="global.html#likePost">likePost</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#modifyCommentPost">modifyCommentPost</a></li><li><a href="global.html#modifyPost">modifyPost</a></li><li><a href="global.html#modifyUser">modifyUser</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#unlikePost">unlikePost</a></li><li><a href="global.html#userIdCheck">userIdCheck</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Mar 19 2021 11:23:58 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
