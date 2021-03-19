@@ -75,7 +75,7 @@ export default {
       const currentPage = (Number(currentURL.get("page")) - 1)
       axios({
         method: "get",
-        url: `http://localhost:3000/api/posts/all?page=${currentPage}&user_id=${this.userConnected.id}`,
+        url: `http://localhost:3000/api/posts/all?page=${currentPage}&user_id=${localStorage.getItem("userId")}`,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`

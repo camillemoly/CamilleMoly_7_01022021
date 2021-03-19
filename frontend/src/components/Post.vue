@@ -2,7 +2,7 @@
   <div :class="$style.post">
 
     <!-- Setting button -->
-    <div v-if="postUserId == userConnected.id || userConnected.isAdmin == true" :class="$style.post__settings" class="dropright">
+    <div v-if="postUserId == loggedInUserId || userConnected.isAdmin == true" :class="$style.post__settings" class="dropright">
       <button class="btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
@@ -64,6 +64,7 @@
         :commentPostId="comment.post_id"
         :content="comment.content"
         :getAllCommentsOfAPost="getAllCommentsOfAPost"
+        :loggedInUserId="loggedInUserId"
       />
     </div>
 
@@ -89,6 +90,7 @@ export default {
   },
   data() {
     return {
+      loggedInUserId: localStorage.getItem("userId"),
       postUser: "",
       likes: "",
       comments: "",
@@ -186,7 +188,7 @@ export default {
       .then(response => {
         this.likes = response.data
         for (let like in this.likes) {
-          if (this.likes[like].user_id == this.userConnected.id) {
+          if (this.likes[like].user_id == this.loggedInUserId) {
             this.postIsLiked = true
           }
         }
@@ -208,13 +210,13 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(this.userConnected.id)
+          user_id: Number(this.loggedInUserId)
         }
       })
 
       .then(() => {
         this.postIsLiked = true
-        this.likes.push(`like of ${this.userConnected.id}`)
+        this.likes.push(`like of ${this.loggedInUserId}`)
       })
 
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
@@ -233,13 +235,13 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(this.userConnected.id)
+          user_id: Number(this.loggedInUserId)
         }
       })
 
       .then(() => {
         this.postIsLiked = false
-        this.likes.pop(`like of ${this.userConnected.id}`)
+        this.likes.pop(`like of ${this.loggedInUserId}`)
       })
 
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
@@ -291,7 +293,7 @@ export default {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         data: {
-          user_id: Number(this.userConnected.id),
+          user_id: Number(this.loggedInUserId),
           content: document.getElementById(`commentInput` + this.postId).value
         }
       })

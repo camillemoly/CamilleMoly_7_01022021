@@ -68,7 +68,7 @@ export default {
       }
       axios({
         method: "put",
-        url: `http://localhost:3000/api/users/${this.userConnected.id}`,
+        url: `http://localhost:3000/api/users/${localStorage.getItem("userId")}`,
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -89,7 +89,7 @@ export default {
     deleteProfile() {
       axios({
         method: "delete",
-        url: `http://localhost:3000/api/users/${this.userConnected.id}`,
+        url: `http://localhost:3000/api/users/${localStorage.getItem("userId")}`,
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         }

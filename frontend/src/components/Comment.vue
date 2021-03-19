@@ -2,7 +2,7 @@
   <div :class="$style.comment">
 
     <!-- Setting button -->
-    <div v-if="commentUserId == userConnected.id || userConnected.isAdmin == true" :class="$style.comment__settings" class="dropright">
+    <div v-if="commentUserId == loggedInUserId || userConnected.isAdmin == true" :class="$style.comment__settings" class="dropright">
       <button class="btn-primary " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
       </button>
@@ -38,7 +38,7 @@ import { mapState } from "vuex"
 
 export default {
   name: "Comment",
-  props: ["commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost"],
+  props: ["loggedInUserId", "commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost"],
   data() {
     return {
       commentUser: "",

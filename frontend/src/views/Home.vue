@@ -101,7 +101,7 @@ export default {
     createPost(){
       const formData = new FormData()
       let postInfos = {
-        user_id: this.userConnected.id,
+        user_id: localStorage.getItem("userId"),
         content: document.getElementById("post_content").value
       }
       formData.set("post", JSON.stringify(postInfos))

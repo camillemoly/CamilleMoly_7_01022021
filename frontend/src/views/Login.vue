@@ -7,7 +7,6 @@
 <script>
 import axios from "axios"
 import Authentication from "../components/Authentication"
-import { mapState } from "vuex"
 
 export default {
   name: "Login",
@@ -25,9 +24,6 @@ export default {
       },
       info: ""
     }
-  },
-  computed: {
-    ...mapState(["userConnected"])
   },
   methods: {
 
