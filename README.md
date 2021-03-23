@@ -7,10 +7,10 @@ Type `cd frontend` then `npm install` to install all the necessary packages in t
 # Databases
 You need to create **3 databases**, for each environment (test, dev, prod), named `groupomania_<ENV>`.
 Each database has **4 tables**:
-* **users** with 8 fields: id, email, password, first_name, last_name, profile_picture, about, is_admin
-* **posts** with 5 fields: id, user_id, date, content, post_picture
-* **likes** with 3 fields: id, user_id, post_id
-* **comments** with 4 fields: id, user_id, post_id, content <br>
+* **users** with **8 fields**: id, email, password, first_name, last_name, profile_picture, about, is_admin
+* **posts** with **5 fields**: id, user_id, date, content, post_picture
+* **likes** with **3 fields**: id, user_id, post_id
+* **comments** with **4 fields**: id, user_id, post_id, content <br>
 <!-- end of the list -->
 Here the database diagram to show the connections between tables (primary key and foreign key): <br>
 ![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
@@ -35,7 +35,8 @@ Here the database diagram to show the connections between tables (primary key an
   * `npm run prod` to be in prod environment
 
 # Begin with the app
-Type `cd frontend` to go to frontend folder. Then type `npm run serve` to launch the web app.
+Type `cd frontend` to go to frontend folder. <br>
+Then type `npm run serve` to launch the web app. <br>
 Launch a server in an other terminal (see [Start the server](##Start-the-server)) and do these steps for **each database**.
   ## Create admin account
   First, you need to create an `admin` account :
