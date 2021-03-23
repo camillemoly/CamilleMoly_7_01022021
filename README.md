@@ -48,10 +48,11 @@ Launch a server in an other terminal (see [Start the server](#Start-the-server))
   Create the first `user` account without admin rights (modify/delete his own account, posts and comments).
 
 # Tests
-  ## Configure the tests
-  First, you need to define in the `.env.test` the `ADMIN_EMAIL`, `ADMIN_PASSWORD` with the admin account you created. <br>
-  Then, do the same thing with `USER_EMAIL`, `USER_PASSWORD` with the admin account you created. <br>
-  To create these accounts, see [Begin with the app](#Begin-with-the-app) section.
+  ## Configure the tests files
+  To perform tests, you must first connect an admin account and a user account to obtain their token. <br>
+  To connect them, you need to define in the `.env.test` the `ADMIN_EMAIL`, `ADMIN_PASSWORD` with the admin account you created. <br>
+  Then, do the same thing for `USER_EMAIL`, `USER_PASSWORD` with the admin account you created. <br>
+  To create these accounts, see [Begin with the app](#Begin-with-the-app) section. <br>
   ## Launch the tests
   Start the server in the test environment (see [Start the server](#Start-the-server) section). <br>
   On an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
