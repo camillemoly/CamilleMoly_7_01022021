@@ -57,5 +57,5 @@ Launch a server in an other terminal (see [Start the server](#Start-the-server))
   Start the server in the test environment (see [Start the server](#Start-the-server) section). <br>
   On an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
 
-# Documentation API
+# API Documentation
 You can consult API documentation just **[here](https://documenter.getpostman.com/view/13743956/TWDTLyEE)**.
