@@ -5,16 +5,20 @@ Type `cd backend` then `npm install` to install all the necessary packages in th
 Type `cd frontend` then `npm install` to install all the necessary packages in the frontend folder.
 
 # Databases
-You need to create **3 databases**, for each environment (test, dev, prod), named `groupomania_<ENV>`.
-Each database has **4 tables**:
-* **users** with **8 fields**: id, email, password, first_name, last_name, profile_picture, about, is_admin
-* **posts** with **5 fields**: id, user_id, date, content, post_picture
-* **likes** with **3 fields**: id, user_id, post_id
-* **comments** with **4 fields**: id, user_id, post_id, content <br>
-<!-- end of the list -->
-Here the database diagram to show the connections between tables (primary keys and foreign keys): <br>
-![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
-
+  ## Create the databases
+  You need to create **3 databases**, for each environment (test, dev, prod), named `groupomania_<ENV>`.
+  Each database has **4 tables**:
+  * **users** with **8 fields**: id, email, password, first_name, last_name, profile_picture, about, is_admin
+  * **posts** with **5 fields**: id, user_id, date, content, post_picture
+  * **likes** with **3 fields**: id, user_id, post_id
+  * **comments** with **4 fields**: id, user_id, post_id, content <br>
+  <!-- end of the list -->
+  Here the database diagram to show the connections between tables (primary keys and foreign keys): <br>
+  ![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
+  ## Create/update models of the database
+  To create/update models of the database tables, you need to type this command (in the backend folder): <br>
+  `node_modules\.bin\sequelize-auto -o "./models" -d <database> -h <host> -u <user> -p [port] -x [password] -e [dialect]` <br>
+  (see [sequelize-auto documentation](https://github.com/sequelize/sequelize-auto))
 
 # Server
   ## Before starting the server
@@ -55,7 +59,7 @@ Launch a server in an other terminal (see [Start the server](#Start-the-server))
   To create these accounts, see [Begin with the app](#Begin-with-the-app) section. <br>
   ## Launch the tests
   Start the server in the test environment (see [Start the server](#Start-the-server) section). <br>
-  On an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
+  In an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
 
 # API Documentation
 You can consult API documentation just **[here](https://documenter.getpostman.com/view/13743956/TWDTLyEE)**.
