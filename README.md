@@ -1,4 +1,4 @@
-![icon-left-font-monochrome-black](https://user-images.githubusercontent.com/65662608/112164165-f3e03800-8bed-11eb-8c07-135a6c675405.png)
+![icon-left-font-monochrome-black - Copie](https://user-images.githubusercontent.com/65662608/112165838-656cb600-8bef-11eb-8e30-b2b0bfd8cba9.png)
 
 # Install modules
 Type `cd backend` then `npm install` to install all the necessary packages in the backend folder. <br>
@@ -10,7 +10,11 @@ Each database has **4 tables**:
 * **users** with 8 fields: id, email, password, first_name, last_name, profile_picture, about, is_admin
 * **posts** with 5 fields: id, user_id, date, content, post_picture
 * **likes** with 3 fields: id, user_id, post_id
-* **comments** with 4 fields: id, user_id, post_id, content
+* **comments** with 4 fields: id, user_id, post_id, content <br>
+<!-- end of the list -->
+Here the database diagram to show the connections between tables (primary key and foreign key): <br>
+![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
+
 
 # Server
   ## Before starting the server
