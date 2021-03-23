@@ -12,7 +12,7 @@ Each database has **4 tables**:
 * **likes** with **3 fields**: id, user_id, post_id
 * **comments** with **4 fields**: id, user_id, post_id, content <br>
 <!-- end of the list -->
-Here the database diagram to show the connections between tables (primary key and foreign key): <br>
+Here the database diagram to show the connections between tables (primary keys and foreign keys): <br>
 ![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
 
 
@@ -37,7 +37,7 @@ Here the database diagram to show the connections between tables (primary key an
 # Begin with the app
 Type `cd frontend` to go to frontend folder. <br>
 Then type `npm run serve` to launch the web app. <br>
-Launch a server in an other terminal (see [Start the server](##Start-the-server)) and do these steps for **each database**.
+Launch a server in an other terminal (see [Start the server](#Start-the-server)) and do these steps for **each database**.
   ## Create admin account
   First, you need to create an `admin` account :
   * Create a new user account
@@ -53,8 +53,8 @@ Launch a server in an other terminal (see [Start the server](##Start-the-server)
   Then, do the same thing with `USER_EMAIL`, `USER_PASSWORD` with the admin account you created. <br>
   To create these accounts, see [Begin with the app](#Begin-with-the-app) section.
   ## Launch the tests
-  Start the server in the test environment (see [Start the server](##Start-the-server) section). <br>
+  Start the server in the test environment (see [Start the server](#Start-the-server) section). <br>
   On an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
 
 # Documentation API
-You can consult API documentation just **[here]**(https://documenter.getpostman.com/view/13743956/TWDTLyEE).
+You can consult API documentation just **[here](https://documenter.getpostman.com/view/13743956/TWDTLyEE)**.
