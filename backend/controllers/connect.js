@@ -37,11 +37,11 @@ const whitespaceValidator = new RegExp(/^\s+$/);
 /****************************** CONNECT CONTROLLERS *****************************/
 
 /**
- * This function will accept request
+ * @description This function will accept request
  * and create a new user in the database with the request information
  *
- * @param   {Object}  req  The user information with first_name, last_name, email and password fields (in body)
- * @param   {Object}  res  The function result 
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
  *
  * @return  {Object}       Success status with message
  */
@@ -94,10 +94,10 @@ exports.signup = (req, res) => {
 };
 
 /**
- * This function will accept request
+ * @description This function will accept request
  * and connect user if his login information is correct
  *
- * @param   {Object}  req  The user information with mail and password fields (in body)
+ * @param   {Object}  req  The request sent from the frontend
  * @param   {Object}  res  The function result 
  *
  * @return  {Object}       Success status with user id, token and message
