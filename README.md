@@ -1,16 +1,24 @@
-![icon-left-font-monochrome-black](https://user-images.githubusercontent.com/65662608/112164165-f3e03800-8bed-11eb-8c07-135a6c675405.png)
+![icon-left-font-monochrome-black - Copie](https://user-images.githubusercontent.com/65662608/112165838-656cb600-8bef-11eb-8e30-b2b0bfd8cba9.png)
 
 # Install modules
 Type `cd backend` then `npm install` to install all the necessary packages in the backend folder. <br>
 Type `cd frontend` then `npm install` to install all the necessary packages in the frontend folder.
 
 # Databases
-You need to create **3 databases**, for each environment (test, dev, prod), named `groupomania_<ENV>`.
-Each database has **4 tables**:
-* **users** with 8 fields: id, email, password, first_name, last_name, profile_picture, about, is_admin
-* **posts** with 5 fields: id, user_id, date, content, post_picture
-* **likes** with 3 fields: id, user_id, post_id
-* **comments** with 4 fields: id, user_id, post_id, content
+  ## Create the databases
+  You need to create **3 databases**, for each environment (test, dev, prod), named `groupomania_<ENV>`.
+  Each database has **4 tables**:
+  * **users** with **8 fields**: id, email, password, first_name, last_name, profile_picture, about, is_admin
+  * **posts** with **5 fields**: id, user_id, date, content, post_picture
+  * **likes** with **3 fields**: id, user_id, post_id
+  * **comments** with **4 fields**: id, user_id, post_id, content <br>
+  <!-- end of the list -->
+  Here the database diagram to show the connections between tables (primary keys and foreign keys): <br>
+  ![database_diagram](https://user-images.githubusercontent.com/65662608/112166136-a95fbb00-8bef-11eb-89b9-892005330041.PNG) <br>
+  ## Create/update models of the database
+  To create/update models of the database tables, you need to type this command (in the backend folder): <br>
+  `node_modules\.bin\sequelize-auto -o "./models" -d <database> -h <host> -u <user> -p [port] -x [password] -e [dialect]` <br>
+  (see [sequelize-auto documentation](https://github.com/sequelize/sequelize-auto))
 
 # Server
   ## Before starting the server
@@ -31,8 +39,9 @@ Each database has **4 tables**:
   * `npm run prod` to be in prod environment
 
 # Begin with the app
-Type `cd frontend` to go to frontend folder. Then type `npm run serve` to launch the web app.
-Launch a server in an other terminal (see [Start the server](##Start-the-server)) and do these steps for **each database**.
+Type `cd frontend` to go to frontend folder. <br>
+Then type `npm run serve` to launch the web app. <br>
+Launch a server in an other terminal (see [Start the server](#Start-the-server)) and do these steps for **each database**.
   ## Create admin account
   First, you need to create an `admin` account :
   * Create a new user account
@@ -43,13 +52,14 @@ Launch a server in an other terminal (see [Start the server](##Start-the-server)
   Create the first `user` account without admin rights (modify/delete his own account, posts and comments).
 
 # Tests
-  ## Configure the tests
-  First, you need to define in the `.env.test` the `ADMIN_EMAIL`, `ADMIN_PASSWORD` with the admin account you created. <br>
-  Then, do the same thing with `USER_EMAIL`, `USER_PASSWORD` with the admin account you created. <br>
-  To create these accounts, see [Begin with the app](#Begin-with-the-app) section.
+  ## Configure the tests files
+  To perform tests, you must first connect an admin account and a user account to obtain their token. <br>
+  To connect them, you need to define in the `.env.test` the `ADMIN_EMAIL`, `ADMIN_PASSWORD` with the admin account you created. <br>
+  Then, do the same thing for `USER_EMAIL`, `USER_PASSWORD` with the admin account you created. <br>
+  To create these accounts, see [Begin with the app](#Begin-with-the-app) section. <br>
   ## Launch the tests
-  Start the server in the test environment (see [Start the server](##Start-the-server) section). <br>
-  On an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
+  Start the server in the test environment (see [Start the server](#Start-the-server) section). <br>
+  In an other terminal, type `cd backend` then `npm run launch-test` to launch the backend tests.
 
-# Documentation API
-You can consult API documentation just **[here]**(https://documenter.getpostman.com/view/13743956/TWDTLyEE).
+# API Documentation
+You can consult API documentation just **[here](https://documenter.getpostman.com/view/13743956/TWDTLyEE)**.
