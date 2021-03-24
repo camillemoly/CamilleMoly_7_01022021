@@ -31,7 +31,7 @@
 <script>
 import axios from "axios"
 import Navigation from "../components/Navigation"
-import { mapState, mapActions } from "vuex"
+import { mapState } from "vuex"
 
 export default {
   name: "MyProfileEdit",
@@ -47,13 +47,11 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["getUserInfos", "resetInfo"]),
 
-    /*************** UPDATE PROFILE *************** /
-     * It gets the information of the differents input, then it puts them in a formData object
-     * It also checks if the user set a new profile picture and if so, it adds the file in the formData
-     * Then it calls the API to update the user profile, displays fail or success message,
-     * and redirect the user to the profile page
+    /**
+     * @description This function will call the API to update the user's profile
+     *
+     * @return  {Object}  Success message
      */
     updateProfile() {
       const formData = new FormData()
@@ -82,9 +80,10 @@ export default {
       .catch(error => { if(error.response) { this.info = error.response.data.error }});
     },
 
-    /*************** DELETE PROFILE *************** /
-     * The function calls the API to delete the user and his profile,
-     * return fail or success response, then redirect user to the login page
+    /**
+     * @description This function will call the API to delete the user's profile
+     *
+     * @return  {Object}  Success message
      */
     deleteProfile() {
       axios({
@@ -100,15 +99,6 @@ export default {
       })
       .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
-  },
-
-  /*************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) *************** /
-   * It calls the getUserInfos function (stored in vuex actions)
-   * to get the information (first name, last name, profile picture and about)
-   * of the connected user and store them as vuex states
-   */
-  created() {
-    this.getUserInfos()
   }
 }
 </script>

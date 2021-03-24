@@ -8,7 +8,6 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userConnected: {
-      id: localStorage.getItem("userId"),
       firstName: "",
       lastName: "",
       profilePicture: "",
@@ -23,9 +22,6 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    EDIT_ID(state, value) {
-      state.userConnected.id = value
-    },
     EDIT_FIRST_NAME(state, value) {
       state.userConnected.firstName = value
     },
@@ -44,6 +40,13 @@ export default new Vuex.Store({
   },
   actions: {
 
+    /**
+     * @description This function will edit user state with user connected information
+     *
+     * @param   {Object}  context  Exposes the same set of methods and properties as the store instance
+     *
+     * @return  {Object}           User object to edit user state of the store
+     */
     getUserInfos(context) {
       axios({
         method: "get",
@@ -68,8 +71,14 @@ export default new Vuex.Store({
       });
     },
 
+    /**
+     * @description This function will edit the user state of the store with empty value
+     *
+     * @param   {Object}  context  Exposes the same set of methods and properties as the store instance
+     *
+     * @return  {Function}         Edits the user state, clears the localStorage and redirects user to the login page
+     */
     signOut(context){
-      context.commit("EDIT_ID", "")
       context.commit("EDIT_FIRST_NAME", "")
       context.commit("EDIT_LAST_NAME", "")
       context.commit("EDIT_PROFILE_PICTURE", "")

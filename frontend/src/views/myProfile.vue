@@ -68,8 +68,13 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["getUserInfos", "signOut"]),
+    ...mapActions(["signOut"]),
 
+    /**
+     * @description This function will call the API to get all posts of the user connected and of the current page
+     *
+     * @return  {Object}  Object with posts, total posts, total pages and current page
+     */
     getProfilePosts() {
       const currentURL = new URLSearchParams(window.location.search)
       const currentPage = (Number(currentURL.get("page")) - 1)
@@ -95,13 +100,9 @@ export default {
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
-   * It calls the getUserInfos function (stored in vuex actions)
-   * to get the information (first name, last name, profile picture and about)
-   * of the connected user and store them as vuex states
-   * It also calls the getMyAllPosts function to retrieve all the posts and displays them
+   * It alls the getProfilePosts function to retrieve all the posts of the user and displays them
    */
   created() {
-    this.getUserInfos()
     this.getProfilePosts()
   }
 }

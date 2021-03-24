@@ -50,10 +50,10 @@ export default {
   },
   methods: {
 
-    /******************** UPDATE COMMENT ******************** /
-     * Calls the API to modify the comment with the new value of editCommentContent input
-     * then passes commentIsEditing to false to display <p> instead of <input>
-     * and calls getAllCommentsOfAPost() to update comments feed without reloading
+    /**
+     * @description This function will call the API to update the comment
+     *
+     * @return  {Function}  Call getAllCommentsOfAPost function to update comments feed
      */
     updateComment() {
       axios({
@@ -77,9 +77,10 @@ export default {
 
     },
 
-    /******************** DELETE COMMENT ******************** /
-     * Calls the API to delete the comment
-     * then calls getAllCommentsOfAPost() to update comments feed without reloading
+    /**
+     * @description This function will call the API to delete the comment
+     *
+     * @return  {Function}  Call getAllCommentsOfAPost function to update comments feed
      */
     deleteComment() {
       axios({

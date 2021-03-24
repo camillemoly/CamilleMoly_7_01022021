@@ -66,11 +66,10 @@ export default {
   methods: {
     ...mapActions(["getUserInfos"]),
 
-
-    /*************** GET POSTS OF THIS PAGE *************** /
-     * This function calls the API to get all posts,
-     * stores them in the posts data,
-     * and displays them
+    /**
+     * @description This function will call the API to get all posts of the current page
+     *
+     * @return  {Object}  Object with posts, total posts, total pages and current page
      */
     getHomePosts(){
       const currentURL = new URLSearchParams(window.location.search)
@@ -94,9 +93,10 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
-    /**************** CREATE POST **************** /
-     * This function calls the API to create a post,
-     * then it calls the getPostsOfThisPage function to update the news feed without reloading the page
+    /**
+     * @description This function will call the API to create a new post 
+     *
+     * @return  {Function}  Function to update the posts feed
      */
     createPost(){
       const formData = new FormData()
@@ -126,9 +126,7 @@ export default {
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
-   * It calls the getUserInfos function (stored in vuex actions)
-   * to get the information (first name, last name, profile picture and about)
-   * of the connected user and store them as vuex states
+   * It calls the getUserInfos function to get the information of the connected user and store them in vuex states
    * It also calls the getPostsOfThisPage function to retrieve all the posts and displays them
    */
   created() {

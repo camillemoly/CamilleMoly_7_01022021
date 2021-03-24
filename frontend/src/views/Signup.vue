@@ -27,10 +27,10 @@ export default {
   },
   methods: {
 
-    /********************* SIGNUP ********************* /
-     * This function calls the API to register the user,
-     * displays the API response (fail or success) by storing it in the vuex info state,
-     * and redirects him to the login page
+    /**
+     * @description This function will call the API to register the user and redirect him to the login page
+     *
+     * @return  {Object}  Success message
      */
     signup() {
       axios({

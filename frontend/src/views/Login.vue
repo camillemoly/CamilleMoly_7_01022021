@@ -27,11 +27,10 @@ export default {
   },
   methods: {
 
-    /********************* LOGIN ********************* /
-     * This function calls the API to connect the user,
-     * displays the API response (fail or success) by storing it in the vuex info state,
-     * store in the localStorage his userId and the generated token,
-     * and redirects him to the home page
+    /**
+     * @description This function will call the API to connect the user and redirect him to the home page
+     *
+     * @return  {Object}  User's token and id
      */
     login() {
       axios({

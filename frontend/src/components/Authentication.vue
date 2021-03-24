@@ -41,15 +41,17 @@ export default {
   props: ["form", "auth", "info"],
   methods: {
 
-    /*************** SHOW PASSWORD *************** /
-     * This function changes type of the password input to show or hide the password
+    /**
+     * @description This function will change the type of the password
+     *
+     * @return  {String}  Type of the password
      */
     showPassword() {
-      var x = document.getElementById("password");
-      if (x.type === "password") {
-        x.type = "text";
+      let password = document.getElementById("password");
+      if (password.type === "password") {
+        password.type = "text";
       } else {
-        x.type = "password";
+        password.type = "password";
       }
     }
   }

@@ -106,12 +106,10 @@ export default {
 
 /************************************************************* POSTS *************************************************************/
 
-    /********************* UPDATE POST ********************* /
-     * Creates formData object with new content and check if the user adds a file
-     * if so, adds it to the formData
-     * Then it calls the API to update the post,
-     * passes the postIsEditing to false to display <p> content instead of <input>
-     * and calls function to update posts feed without reloading the page
+    /**
+     * @description This function will call the API to update the post
+     *
+     * @return  {Function}  Passes the postIsEditing to false, and call a function update the posts feed
      */
     updatePost() {
       const formData = new FormData()
@@ -145,9 +143,10 @@ export default {
       .catch(error => { if (error.response) { console.log(error.response.data.error) }});
     },
 
-    /********************* DELETE POST ********************* /
-     * Calls the API to delete the post
-     * then calls function to update posts feed without reloading the page
+    /**
+     * @description This function will call the API to delete the post
+     *
+     * @return  {Function}  Call a function to update the posts feed
      */
     deletePost() {
       axios({
@@ -171,10 +170,10 @@ export default {
 
 /************************************************************* LIKES *************************************************************/
 
-    /********************* GET ALL LIKES OF A POST ********************* /
-     * Calls the API to get all the likes of the post then it stores them to likes data
-     * it also checks if there is the user_id of the user connected
-     * if so, it passes the postIsLiked to true (to define post as liked)
+    /**
+     * @description This function will call the API to get all likes of a post
+     *
+     * @return  {Object}   Contains all likes
      */
     getAllLikesOfAPost() {
       axios({
@@ -197,9 +196,10 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
-    /********************* LIKE POST ********************* /
-     * Calls the API to create the like of the post,
-     * then passes the postIsLiked to true and push new like to likes array (+1 like)
+    /**
+     * @description This function will call the API to like the post (create a like)
+     *
+     * @return  {Function}  Passes postIdLiked to true and push a like in the likes array to display +1 like
      */
     likePost() {
       axios({
@@ -222,9 +222,10 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
-    /********************* UNLIKE POST ********************* /
-     * Calls the API to delete the like of the post,
-     * then passes the postIsLiked to false and pop the like from likes array (-1 like)
+    /**
+     * @description This function will call the API to unlike the post (delete the like)
+     *
+     * @return  {Function}  Passes postIdLiked to false and pop the like of the likes array to display -1 like
      */
     unlikePost() {
       axios({
@@ -249,8 +250,10 @@ export default {
 
 /*********************************************************** COMMENTS ************************************************************/
 
-    /********************* SHOW HIDE COMMENTS ********************* /
-     * Show or hide comments section depending of its state
+    /**
+     * @description This function will toggle the showComments to display or not comments section
+     *
+     * @return  {Boolean}  Return true if the showComments is false, or false if it's true
      */
     showHideComments() {
       if (this.showComments == false) {
@@ -260,8 +263,10 @@ export default {
       }
     },
 
-    /********************* GET ALL COMMENTS OF A POST ********************* /
-     * Calls the API to get all comment of a post and store them to the comments data
+    /**
+     * @description This function will call the API to get all comments of a post and display them
+     *
+     * @return  {Object}  Contain all comments
      */
     getAllCommentsOfAPost() {
       axios({
@@ -279,10 +284,10 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
-    /********************* COMMENT POST ********************* /
-     * Calls the API to create a comment of a post with user_id and content,
-     * then calls the function to update comment feed without reloading
-     * and empty input value
+    /**
+     * @description This function will call the API to comment a post (create a comment)
+     *
+     * @return  {Function}  Calls getAllCommentsOfAPost function to update comments feed
      */
     commentPost() {
       axios({
@@ -308,7 +313,7 @@ export default {
 
   /************** WHEN THE COMPONENT IS CREATED (BEFORE MOUNTED) ************** /
    * Calls the API to get the user information who created the post,
-   * to get his profile picture and full name, and stores them to user data
+   * to get his profile picture and full name and stores them to postUser data
    * Then it calls function to display likes and comments
    */
   created() {
