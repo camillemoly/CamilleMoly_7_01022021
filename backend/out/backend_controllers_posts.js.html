@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/posts.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/posts.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*********************************** IMPORTS ***********************************/
+
+const sequelize = require("../db-connection/db-connection");
+const initModels = require("../models/init-models");
+const models = initModels(sequelize);
+const moment = require("moment");
+const fs = require("fs");
+
+const userIdCheck = (req) => {
+  return req.user.user_id;
+}
+const isAdminCheck = (req) => {
+  return req.user.is_admin;
+}
+
+
+/********************************* PAGINATION **********************************/
+
+/**
+ * @description This function will accept queries from frontend,
+ * and defines limit and offset from them
+ *
+ * @param   {Number}  page  Number: the current page
+ * @param   {Number}  size  Number: how many items are fetched per page
+ *
+ * @return  {Object}        Limit and offset clauses
+ */
+const getPagination = (page, size) => {
+  const limit = size ? +size : 5;
+  const offset = page ? page * limit : 0;
+  return { limit, offset };
+};
+
+/**
+ * @description This function will accept the data returned by the server, page and limit from frontend
+ * and returns object response with these values
+ *
+ * @param   {Object}  data   Object: the data returned by the server (required)
+ * @param   {Number}  page   Number: the current page
+ * @param   {Number}  limit  Number: how many items are fetched per page (required)
+ *
+ * @return  {Object}         Object response with posts data and details for pagination
+ */
+const getPagingData = (data, page, limit) => {
+  const { count: totalPosts, rows: posts } = data;
+  const currentPage = page ? +page : 0;
+  const totalPages = Math.ceil(totalPosts / limit);
+  return { totalPosts, posts, totalPages, currentPage };
+};
+
+
+/******************************* POSTS CONTROLLERS *******************************/
+
+/**
+ * @description This function will accept request
+ * and get all posts from the database
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with pagination object which contains:
+ *                         Object: posts, Number: totalPosts, Number: currentPage, Number: totalPages
+ */
+exports.getAllPosts = (req, res) => {
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+
+  models.posts.findAndCountAll({ 
+    limit: limit,
+    offset: offset,
+    order: [[ "date", "DESC" ], [ "id", "DESC" ]],
+    where: req.query.user_id ? { user_id: req.query.user_id } : {} // if query contains user_id, search for posts with this id
+  })
+
+  .then(posts => {
+    if (!posts) {
+      return res.status(404).json({ error: "Aucun post trouvé !" });
+    } else {
+      const response = getPagingData(posts, page, limit) // return posts with totalPosts number, totalPages number and currentPage
+      return res.status(200).json(response);
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and create new post in the database
+ *
+ * @param   {FormData}  req  The request sent from the frontend
+ * @param   {Object}    res  The function result
+ *
+ * @return  {Object}         Success status with message
+ */
+exports.createPost = (req, res) => {
+  const date = moment(new Date()).format("YYYY-MM-DD");
+  const postObject = req.file ? // checks if user create a post with a file
+    {
+      ...JSON.parse(req.body.post),
+      post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...JSON.parse(req.body.post) }
+  models.users.findOne({ where: { id: postObject.user_id } })
+
+  .then(user => {
+    if (!user) {
+      return res.status(404).json({ error: "Création de post impossible, cet utilisateur n'existe pas !" });
+    } else if (!postObject.content) {
+      return res.status(401).json({ error: "Un post doit contenir du texte !" });
+    } else {
+      const post = models.posts.create({
+        ...postObject,
+        date: date
+      })
+      return res.status(201).json({ message: "Post créé !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and update the post in the database
+ *
+ * @param   {FormData}  req  The request sent from the frontend
+ * @param   {Object}    res  The function result
+ *
+ * @return  {Object}         Success status with message
+ */
+exports.modifyPost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  const postObject = req.file ? // checks if user modify the post with a file
+    {
+      ...JSON.parse(req.body.post),
+      post_picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...JSON.parse(req.body.post) }
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Modification impossible, ce post n'existe pas !" });
+    } else if (post.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the post and admin can modify the post
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modification pour ce post !" });
+    } else if (!postObject.content) {
+      return res.status(401).json({ error: "Un post doit contenir du texte !" });
+    } else if (post.post_picture &amp;&amp; req.file) {
+    // If the post contains a picture and the request contains a file, delete old pic and replace it by the new one
+      const filename = post.post_picture.split("/images/")[1];
+      fs.unlink(`images/${filename}`, () => {
+        post.update({
+          ...postObject
+        })
+        return res.status(201).json({ message: "Post modifié avec succès !" })
+      })
+    } else {
+      post.update({
+        ...postObject
+      })
+      return res.status(201).json({ message: "Post modifié avec succès !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and delete post's likes, comments, and post in the database
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.deletePost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Suppression impossible, ce post n'existe pas !" });
+    } else if (post.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the post and admin can delete the post
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce post !" });
+    } else {
+      return models.likes.findAll({ where: { post_id: req.params.id } })
+    }
+  })
+
+  .then(likes => {
+    if (likes == "") {
+      return models.comments.findAll({ where: { post_id: req.params.id } })
+    } else { // if post has likes, delete them
+      for(let like in likes) {
+      likes[like].destroy()
+      }
+      return models.comments.findAll({ where: { post_id: req.params.id } })
+    }
+  })
+
+  .then(comments => { // if post has comments, delete them
+    if (comments == "") {
+      return models.posts.findOne({ where: { id: req.params.id } })
+    } else {
+      for(let comment in comments) {
+      comments[comment].destroy()
+      }
+      return models.posts.findOne({ where: { id: req.params.id } })
+    }
+  })
+
+  .then(post => {
+    if (post.post_picture) { // if the post contains a picture, delete it
+      const filename = post.post_picture.split("/images/")[1];
+      fs.unlink(`images/${filename}`, () => {
+        post.destroy()
+        return res.status(200).json({ message: "Post supprimé !" })
+      })
+    } else {
+      post.destroy()
+      return res.status(200).json({ message: "Post supprimé !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and search for all likes for the post with its id
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       The likes object with success status
+ */
+exports.getAllLikesOfAPost = (req, res) => {
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Le post n'existe pas !" });
+    } else {
+      return models.likes.findAll({ where: { post_id: req.params.id } })
+    }
+  })
+
+  .then(likes => {
+    return res.status(200).json(likes)
+  })
+  
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and create like for the post with this id
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.likePost = (req, res) => {
+  models.users.findOne({ where: { id: req.body.user_id } })
+
+  .then(user => {
+    if (!user) {
+      return res.status(404).json({ error: "Like impossible, cet utilisateur n'existe pas !" });
+    } else {
+      return models.posts.findOne({ where: { id: req.params.id } })
+    }
+  })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Like impossible, ce post n'existe pas !" });
+    } else {
+      const like = models.likes.create({
+        post_id: req.params.id,
+        user_id: req.body.user_id
+      })
+      return res.status(201).json({ message: "Publication likée !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and delete like for the post with this id
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.unlikePost = (req, res) => {
+  models.likes.findOne({ where: { post_id: req.params.id, user_id: req.body.user_id } })
+
+  .then(like => {
+    if (!like) {
+      return res.status(404).json({ error: "Annulation impossible, ce like n'existe pas !" });
+    } else {
+      like.destroy()
+      return res.status(200).json({ message: "Like annulé !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and search for all comments for the post with its id
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       The comments object with success status
+ */
+exports.getAllCommentsOfAPost = (req, res) => {
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Le post n'existe pas !" });
+    } else {
+      return models.comments.findAll({ where: { post_id: req.params.id } })
+    }
+  })
+
+  .then(comments => {
+    return res.status(200).json(comments)
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+  
+};
+
+/**
+ * @description This function will accept request
+ * and create new comment in the database
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.commentPost = (req, res) => {
+  models.users.findOne({ where: { id: req.body.user_id } })
+
+  .then(user => {
+    if (!user) {
+      return res.status(404).json({ error: "Commentaire impossible à ajouter, cet utilisateur n'existe pas !" });
+    } else {
+      return models.posts.findOne({ where: { id: req.params.id } })
+    }
+  })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Commentaire impossible à ajouter, ce post n'existe pas !" });
+    } else if (!req.body.content) {
+      return res.status(401).json({ error: "Un commentaire ne peut pas être vide !" });
+    } else {
+      const comment = models.comments.create({
+        user_id: req.body.user_id,
+        post_id: req.params.id,
+        content: req.body.content
+      })
+      return res.status(201).json({ message: "Commentaire ajouté !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and update the comment in the database
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.modifyCommentPost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Modification impossible, ce post n'existe pas !" });
+    } else {
+      return models.comments.findOne({ where: { id: req.params.comment_id } })
+    }
+  })
+
+  .then(comment => {
+    if (!comment) {
+      return res.status(404).json({ error: "Modification impossible, ce commentaire n'existe pas !" });
+    } else if (comment.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the comment and admin can modify the comment
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de modifications pour ce commentaire !" });
+    } else if (!req.body.content) {
+      return res.status(401).json({ error: "Un commentaire ne doit pas être vide !" });
+    } else {
+      comment.update({
+        content: req.body.content
+      })
+      return res.status(201).json({ message: "Commentaire modifié !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};
+
+/**
+ * @description This function will accept request
+ * and delete the comment in the database
+ *
+ * @param   {Object}  req  The request sent from the frontend
+ * @param   {Object}  res  The function result
+ *
+ * @return  {Object}       Success status with message
+ */
+exports.deleteCommentPost = (req, res) => {
+  const userIdToken = userIdCheck(req);
+  const isAdminToken = isAdminCheck(req);
+  models.posts.findOne({ where: { id: req.params.id } })
+
+  .then(post => {
+    if (!post) {
+      return res.status(404).json({ error: "Suppression impossible, ce post n'existe pas !" });
+    } else {
+      return models.comments.findOne({ where: { id: req.params.comment_id } })
+    }
+  })
+
+  .then(comment => {
+    if (!comment) {
+      return res.status(404).json({ error: "Suppression impossible, ce commentaire n'existe pas !" });
+    } else if (comment.user_id !== userIdToken &amp;&amp; isAdminToken == false) { // only the owner of the comment and admin can delete the comment
+      return res.status(401).json({ error: "L'utilisateur ne dispose pas des droits de suppression pour ce commentaire !" });
+    } else {
+      comment.destroy()
+      return res.status(200).json({ message: "Commentaire supprimé !" })
+    }
+  })
+
+  .catch(error => res.status(500).json({ message: error.message }));
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#commentPost">commentPost</a></li><li><a href="global.html#createPost">createPost</a></li><li><a href="global.html#deleteCommentPost">deleteCommentPost</a></li><li><a href="global.html#deletePost">deletePost</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#getAllCommentsOfAPost">getAllCommentsOfAPost</a></li><li><a href="global.html#getAllLikesOfAPost">getAllLikesOfAPost</a></li><li><a href="global.html#getAllPosts">getAllPosts</a></li><li><a href="global.html#getOneUser">getOneUser</a></li><li><a href="global.html#getPagination">getPagination</a></li><li><a href="global.html#getPagingData">getPagingData</a></li><li><a href="global.html#isAdminCheck">isAdminCheck</a></li><li><a href="global.html#likePost">likePost</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#modifyCommentPost">modifyCommentPost</a></li><li><a href="global.html#modifyPost">modifyPost</a></li><li><a href="global.html#modifyUser">modifyUser</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#unlikePost">unlikePost</a></li><li><a href="global.html#userIdCheck">userIdCheck</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 14:11:15 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

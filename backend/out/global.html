@@ -164,7 +164,7 @@
 
             
 
-            <td class="description last">The comment's information (in body) and post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -228,7 +228,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line361">line 361</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line353">line 353</a>
     </li></ul></dd>
     
 
@@ -346,7 +346,7 @@
 
             
 
-            <td class="description last">The post's information and its post_picture (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -410,7 +410,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line95">line 95</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -528,7 +528,7 @@
 
             
 
-            <td class="description last">The comment id and post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -592,7 +592,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line439">line 439</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line431">line 431</a>
     </li></ul></dd>
     
 
@@ -710,7 +710,7 @@
 
             
 
-            <td class="description last">The post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -774,7 +774,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line176">line 176</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line177">line 177</a>
     </li></ul></dd>
     
 
@@ -892,7 +892,7 @@
 
             
 
-            <td class="description last">The user id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -1074,7 +1074,7 @@
 
             
 
-            <td class="description last">The post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -1138,7 +1138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line329">line 329</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line325">line 325</a>
     </li></ul></dd>
     
 
@@ -1256,7 +1256,7 @@
 
             
 
-            <td class="description last">The post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -1438,7 +1438,7 @@
 
             
 
-            <td class="description last">The queries of request</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -1502,7 +1502,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line63">line 63</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -1531,7 +1531,7 @@
 
         
 <div class="param-desc">
-    Success status with response (contains posts, total posts number, current page, total page number)
+    Success status with pagination object which contains:                        Object: posts, Number: totalPosts, Number: currentPage, Number: totalPages
 </div>
 
 
@@ -1620,7 +1620,7 @@
 
             
 
-            <td class="description last">The user id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -1713,7 +1713,7 @@
 
         
 <div class="param-desc">
-    The user object with success status
+    The user found object with success status
 </div>
 
 
@@ -1802,7 +1802,7 @@
 
             
 
-            <td class="description last">The current page</td>
+            <td class="description last">Number: the current page</td>
         </tr>
 
     
@@ -1825,7 +1825,7 @@
 
             
 
-            <td class="description last">How many item are fetched per page</td>
+            <td class="description last">Number: how many items are fetched per page</td>
         </tr>
 
     
@@ -1984,7 +1984,7 @@
 
             
 
-            <td class="description last">The data returned by the server</td>
+            <td class="description last">Object: the data returned by the server (required)</td>
         </tr>
 
     
@@ -2007,7 +2007,7 @@
 
             
 
-            <td class="description last">The current page</td>
+            <td class="description last">Number: the current page</td>
         </tr>
 
     
@@ -2030,7 +2030,7 @@
 
             
 
-            <td class="description last">How many item are fetched per page</td>
+            <td class="description last">Number: how many items are fetched per page (required)</td>
         </tr>
 
     
@@ -2100,7 +2100,7 @@
 
         
 <div class="param-desc">
-    Object response with posts data and detail fo pagination
+    Object response with posts data and details for pagination
 </div>
 
 
@@ -2129,7 +2129,7 @@
     
 
     
-    <h4 class="name" id="isAdminCheck"><span class="type-signature"></span>isAdminCheck<span class="signature">(req)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="isAdminCheck"><span class="type-signature"></span>isAdminCheck<span class="signature">(req)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
     
 
     
@@ -2137,7 +2137,7 @@
 
 
 <div class="description">
-    This function will accept requestand return its user is_admin (false or true)
+    This function will accept request from the frontendand return the is_admin from the token
 </div>
 
 
@@ -2189,7 +2189,7 @@
 
             
 
-            <td class="description last">The user's information (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -2259,7 +2259,7 @@
 
         
 <div class="param-desc">
-    User is_admin
+    User's is_admin
 </div>
 
 
@@ -2270,7 +2270,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">Boolean</span>
 
 
     </dd>
@@ -2348,7 +2348,7 @@
 
             
 
-            <td class="description last">The post id (in params) and user_id (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -2412,7 +2412,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line270">line 270</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line266">line 266</a>
     </li></ul></dd>
     
 
@@ -2530,7 +2530,7 @@
 
             
 
-            <td class="description last">The user information with mail and password fields (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -2712,7 +2712,7 @@
 
             
 
-            <td class="description last">The comment's information (in body) and post id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -2776,7 +2776,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line399">line 399</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line391">line 391</a>
     </li></ul></dd>
     
 
@@ -2894,7 +2894,7 @@
 
             
 
-            <td class="description last">The post's information only or with its post_picture (in body), and its id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -2958,7 +2958,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line130">line 130</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -3076,7 +3076,7 @@
 
             
 
-            <td class="description last">The user's information only or with his profile_picture (in body), and his id (in params)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -3258,7 +3258,7 @@
 
             
 
-            <td class="description last">The user information with first_name, last_name, email and password fields (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -3440,7 +3440,7 @@
 
             
 
-            <td class="description last">The post id (in params) and user_id (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -3504,7 +3504,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line305">line 305</a>
+        <a href="posts.js.html">posts.js</a>, <a href="posts.js.html#line301">line 301</a>
     </li></ul></dd>
     
 
@@ -3570,7 +3570,7 @@
 
 
 <div class="description">
-    This function will accept requestand return its user id
+    This function will accept request from the frontendand return the user_id from the token
 </div>
 
 
@@ -3622,7 +3622,7 @@
 
             
 
-            <td class="description last">The user's information (in body)</td>
+            <td class="description last">The request sent from the frontend</td>
         </tr>
 
     
@@ -3692,7 +3692,7 @@
 
         
 <div class="param-desc">
-    User id
+    User's user_id
 </div>
 
 
@@ -3737,7 +3737,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Mar 19 2021 11:23:58 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 14:17:48 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>
