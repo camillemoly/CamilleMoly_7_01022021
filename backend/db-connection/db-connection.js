@@ -14,7 +14,11 @@ const sequelize = new Sequelize(
 );
 
 sequelize.authenticate()
-  .then(() => { console.log(`Connection to groupomania_${process.env.NODE_ENV} has been established successfully.`) })
+  .then(() => { 
+    if (process.env.NODE_ENV == "dev" || process.env.NODE_ENV == "prod") {
+      console.log(`Connection to groupomania_${process.env.NODE_ENV} has been established successfully.`) 
+    }
+  })
   .catch((error) => console.error("Unable to connect to the database:", error));
 
 module.exports = sequelize;
