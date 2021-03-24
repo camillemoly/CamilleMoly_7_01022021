@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha -R list",
+    "test": "cross-env NODE_ENV=test nodemon server",
+    "launch-test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha -R list",
     "dev": "cross-env NODE_ENV=dev nodemon server",
     "prod": "cross-env NODE_ENV=prod nodemon server"
   },
