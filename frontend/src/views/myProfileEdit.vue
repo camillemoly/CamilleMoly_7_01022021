@@ -19,7 +19,7 @@
         </div>
         <div class="mb-3" :class="$style.profile__form__upload">
           <label for="profilePicture" class="form-label">Choisir une nouvelle photo de profil</label><br>
-          <input type="file" id="profilePicture" name="profilePicture" accept="image/png, image/jpeg">
+          <input type="file" id="profilePicture" name="profilePicture" accept="image/png, image/jpeg, image/jpg">
         </div>
         <button type="button" :class="$style.profile__form__button" class="btn-secondary" @click="updateProfile">Valider</button>
         <button type="button" :class="$style.profile__form__button" class="btn-tertiary" @click="deleteProfile">Supprimer le profil</button>
