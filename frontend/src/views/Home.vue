@@ -64,7 +64,7 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["getUserInfos"]),
+    ...mapActions(["getUserInfos", "checkIfUserIsConnected"]),
 
     /**
      * @description This function will call the API to get all posts of the current page
@@ -126,10 +126,12 @@ export default {
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
+   * It checks if the user is connected and if not, redirects him to the login page
    * It calls the getUserInfos function to get the information of the connected user and store them in vuex states
    * It also calls the getPostsOfThisPage function to retrieve all the posts and displays them
    */
   created() {
+    this.checkIfUserIsConnected()
     this.getUserInfos()
     this.getHomePosts()
   }

@@ -31,7 +31,7 @@
 <script>
 import axios from "axios"
 import Navigation from "../components/Navigation"
-import { mapState } from "vuex"
+import { mapState, mapActions } from "vuex"
 
 export default {
   name: "MyProfileEdit",
@@ -47,6 +47,7 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
+    ...mapActions(["checkIfUserIsConnected"]),
 
     /**
      * @description This function will call the API to update the user's profile
@@ -99,6 +100,13 @@ export default {
       })
       .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
+  },
+
+  /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
+   * It checks if the user is connected and if not, redirects him to the login page
+   */
+  created() {
+    this.checkIfUserIsConnected()
   }
 }
 </script>

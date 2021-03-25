@@ -63,12 +63,7 @@ export default new Vuex.Store({
         context.commit("EDIT_ABOUT", user.data.about)
         context.commit("EDIT_IS_ADMIN", user.data.is_admin)
       })
-      .catch(error => { 
-        if(error.response) {
-          console.log(error.response.data.error)
-          context.dispatch("signOut")
-        }
-      });
+      .catch(error => { console.log(error.response.data.error) });
     },
 
     /**
@@ -86,6 +81,17 @@ export default new Vuex.Store({
       context.commit("EDIT_IS_ADMIN", "")
       localStorage.clear()
       router.push({ name: "Login" })
+    },
+
+    /**
+     * @description This function will check if the localStorage contains a token
+     *
+     * @return  {Function}   Redirects the user to the login page
+     */
+    checkIfUserIsConnected() {
+      if (!localStorage.getItem("token")) {
+        router.push({ name: "Login" })
+      }
     }
   }
 })

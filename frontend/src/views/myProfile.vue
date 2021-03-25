@@ -68,7 +68,7 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["signOut"]),
+    ...mapActions(["signOut", "checkIfUserIsConnected"]),
 
     /**
      * @description This function will call the API to get all posts of the user connected and of the current page
@@ -100,9 +100,11 @@ export default {
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
-   * It alls the getProfilePosts function to retrieve all the posts of the user and displays them
+   * It checks if the user is connected and if not, redirects him to the login page
+   * and calls the getProfilePosts function to retrieve all the posts of the user and displays them
    */
   created() {
+    this.checkIfUserIsConnected()
     this.getProfilePosts()
   }
 }
