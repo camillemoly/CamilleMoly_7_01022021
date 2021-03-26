@@ -13,8 +13,8 @@ export default {
   components: {
     Authentication
   },
-  data(){
-    return{
+  data() {
+    return {
       form: {
         typeOfAuth: "Inscription",
         authBtn: "S'inscrire",
