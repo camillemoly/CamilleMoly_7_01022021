@@ -73,7 +73,7 @@ export default new Vuex.Store({
      *
      * @return  {Function}         Edits the user state, clears the localStorage and redirects user to the login page
      */
-    signOut(context){
+    signOut(context) {
       context.commit("EDIT_FIRST_NAME", "")
       context.commit("EDIT_LAST_NAME", "")
       context.commit("EDIT_PROFILE_PICTURE", "")
@@ -89,7 +89,7 @@ export default new Vuex.Store({
      * @return  {Function}   Redirects the user to the login page
      */
     checkIfUserIsConnected() {
-      if (!localStorage.getItem("token")) {
+      if (!localStorage.getItem("token") || !localStorage.getItem("userId")) {
         router.push({ name: "Login" })
       }
     }
