@@ -8,55 +8,55 @@ button {
 }
 
 input:focus, textarea:focus {
-  outline: none;
+  outline: 2px solid $color-secondary;
 }
 
-.btn-primary{
+.btn-primary {
   background-color: $color-primary;
-  &:hover{
+  &:hover {
     background-color: darken($color-primary, 5%);
   }
 }
 
-.btn-secondary{
+.btn-secondary {
   background-color: $color-secondary;
-  &:hover{
+  &:hover {
     background-color: darken($color-secondary, 5%);
   }
 }
 
-.btn-tertiary{
+.btn-tertiary {
   background-color: $color-tertiary;
-  &:hover{
+  &:hover {
     background-color: darken($color-tertiary, 5%);
   }
 }
 
-.info{
+.info {
   padding: 3px 10px;
   border-radius: 4px;
   background-color: $color-secondary;
 }
 
-.img-cover{
+.img-cover {
   height: 100%;
   width: 100%;
   object-fit: cover;
 }
 
-.img-container-rounded{
+.img-container-rounded {
   border-radius: 50%;
   overflow: hidden;
 }
 
-::-webkit-file-upload-button{
+::-webkit-file-upload-button {
   border: none;
   border-radius: 4px;
   outline: none;
   cursor: pointer;
   color: white;
   background: #1dc7c1;
-  &:hover{
+  &:hover {
     background-color: darken(#1dc7c1, 5%);
   }
 }

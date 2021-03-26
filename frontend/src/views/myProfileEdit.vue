@@ -47,7 +47,7 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["checkIfUserIsConnected"]),
+    ...mapActions(["checkIfUserIsConnected", "getUserInfos"]),
 
     /**
      * @description This function will call the API to update the user's profile
@@ -107,20 +107,21 @@ export default {
    */
   created() {
     this.checkIfUserIsConnected()
+    this.getUserInfos()
   }
 }
 </script>
 
 <style module lang="scss">
-.profile{
+.profile {
   width: 100%;
-  &__form{
+  &__form {
     width: 80%;
     margin: auto;
-    &__upload{
+    &__upload {
       overflow: hidden;
     }
-    &__button{
+    &__button {
       margin: 0 16px 16px 0;
     }
   }

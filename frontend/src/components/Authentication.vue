@@ -1,13 +1,13 @@
 <template>
   <div :class="$style.auth">
     <div :class="$style.auth__logo">
-      <img :class="$style.auth__logo__image" src="../assets/entire-logo.png">
+      <img :class="$style.auth__logo__image" src="../assets/entire-logo.png" alt="logo groupomania">
     </div>
     <form :class="$style.auth__form">
       <h1 :class="$style.auth__form__title">{{ form.typeOfAuth }}</h1>
       <p v-if="info !== ''" class="info">{{ info }}</p>
       <div v-if="$route.name == 'Signup'" class="mb-3"> <!-- display only on signup page -->
-        <label for="firsName" class="form-label">Prénom</label>
+        <label for="firstName" class="form-label">Prénom</label>
         <input id="firstName" type="text" class="form-control">
       </div>
       <div v-if="$route.name == 'Signup'" class="mb-3"> <!-- display only on signup page -->
@@ -24,7 +24,7 @@
       </div>
       <div class="mb-3 form-check">
         <input @click="showPassword" id="showHide" type="checkbox" class="form-check-input">
-        <label class="form-check-label" for="showHide">Afficher/masquer</label>
+        <label class="form-check-label" for="showHide">Afficher/masquer le mot de passe</label>
       </div>
       <button @click="auth" type="button" class="btn-secondary">{{ form.authBtn }}</button>
       <p :class="$style.auth__form__question">{{ form.question }}</p>
@@ -59,43 +59,43 @@ export default {
 </script>
 
 <style module lang="scss">
-.auth{
+.auth {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
   padding: 30px 0;
-  &__logo{
+  &__logo {
     width: 60%;
     max-width: 450px;
     margin: 10px 0 50px 0;
-    &__image{
+    &__image {
       height: auto;
       width: 100%;
       object-fit: cover;
     }
   }
-  &__form{
+  &__form {
     width: 80%;
     max-width: 450px;
-    &__title{
+    &__title {
       display: inline-block;
       margin-bottom: 15px;
       border-bottom: 2px solid white;
       font-size: 2rem;
     }
-    &__question{
+    &__question {
       margin: 30px 0 5px 0;
     }
   }
 }
 
 @media (min-width: 1024px) {
-  .auth{
+  .auth {
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    &__logo, &__form{
+    &__logo, &__form {
       width: 40%;
     }
   }

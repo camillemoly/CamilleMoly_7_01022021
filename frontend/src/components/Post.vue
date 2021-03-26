@@ -4,7 +4,7 @@
     <!-- Setting button -->
     <div v-if="postUserId == loggedInUserId || userConnected.isAdmin == true" :class="$style.post__settings" class="dropright">
       <button class="btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-ellipsis-h"></i>
+        <i class="fas fa-ellipsis-h" title="ouvrir les paramètres"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a @click="postIsEditing = true" :class="$style.post__settings__edit" class="dropdown-item">Modifier</a>
@@ -15,32 +15,30 @@
     <!-- User profile picture, fullname and post date -->
     <div :class="$style.post__user">
       <div :class="$style.post__user__picture" class="img-container-rounded">
-        <img :src="postUser.profile_picture" class="img-cover" />
+        <img :src="postUser.profile_picture" :alt="'photo de profil de ' + [[ postUser.first_name ]] + ' ' + [[ postUser.last_name ]]" class="img-cover"/>
       </div>
       <div :class="$style.post__user__infos">
-        <p :class="$style.post__user__infos__name">
-          {{ postUser.first_name }} {{ postUser.last_name }}
-        </p>
+        <p :class="$style.post__user__infos__name">{{ postUser.first_name }} {{ postUser.last_name }}</p>
         <p :class="$style.post__user__infos__date">{{ date }}</p>
       </div>
     </div>
 
     <!-- Content, post picture and button when the post is not editing -->
     <p v-show="postIsEditing == false" :class="$style.post__content">{{ content }}</p>
-    <img v-show="postIsEditing == false && postPicture !== null" :class="$style.post__picture" :src="postPicture"/>
+    <img v-show="postIsEditing == false && postPicture !== null" :class="$style.post__picture" :src="postPicture" alt="image du post"/>
     <div v-show="postIsEditing == false" :class="$style.post__buttons">
 
       <!-- Like button when the post is not liked -->
       <button v-show="postIsLiked == false" @click="likePost" class="btn-primary like">
         <span v-show="likes.length > 0">{{ likes.length }} </span>
         <span v-show="likes.length == 0"> J'aime </span>
-        <i class="fas fa-thumbs-up"></i>
+        <i class="fas fa-thumbs-up" title="pouce j'aime"></i>
       </button>
       <!-- Like button when the post is liked -->
       <button v-show="postIsLiked" @click="unlikePost" class="btn-secondary like">
         <span v-show="likes.length > 0">{{ likes.length }} </span>
         <span v-show="likes.length == 0"> J'aime </span>
-        <i class="fas fa-thumbs-up"></i>
+        <i class="fas fa-thumbs-up" title="pouce j'aime"></i>
       </button>
       <button @click="showHideComments" class="btn-primary">
         <span>Commenter</span>
@@ -51,9 +49,9 @@
     <!-- Comments area -->
     <div v-show="showComments && postIsEditing == false" :class="$style.post__comments">
       <div :class="$style.post__comments__area">
-        <textarea :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici..."></textarea>
+        <textarea :id="'commentInput' + [[ postId ]]" :class="$style.post__comments__input" placeholder="Commentez ici..." name="commentaire"></textarea>
         <button @click="commentPost" :class="$style.post__comments__valid" class="btn-secondary">
-          <i class="fab fa-telegram-plane"></i>
+          <i class="fab fa-telegram-plane" title="envoyer"></i>
         </button>
       </div>
       <Comment
@@ -395,7 +393,7 @@ export default {
     flex-wrap: wrap;
     width: 100%;
     margin-top: 10px;
-    & button{
+    & button {
       margin: 5px;
     }
   }
@@ -403,7 +401,7 @@ export default {
     width: 100%;
     margin-top: 30px;
     text-align: center;
-    &__number{
+    &__number {
       margin: 5px;
       border: none;
       font-weight: bold;

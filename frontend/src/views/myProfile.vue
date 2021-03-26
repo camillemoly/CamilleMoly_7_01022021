@@ -3,7 +3,7 @@
     <Navigation/>
     <div :class="$style.profile__container">
       <div :class="$style.profile__picture" class="img-container-rounded">
-        <img :src="userConnected.profilePicture" class="img-cover">
+        <img :src="userConnected.profilePicture" alt="ma photo de profil" class="img-cover">
       </div>
       <h1 :class="$style.profile__fullname">{{ fullName }}</h1>
       <div :class="$style.profile__about">
@@ -55,8 +55,8 @@ export default {
     Post,
     ProfilePagination
   },
-  data(){
-    return{
+  data() {
+    return {
       posts: "",
       totalPosts: "",
       currentPage: "",
@@ -68,7 +68,7 @@ export default {
     ...mapState(["userConnected"])
   },
   methods: {
-    ...mapActions(["signOut", "checkIfUserIsConnected"]),
+    ...mapActions(["checkIfUserIsConnected", "getUserInfos", "signOut"]),
 
     /**
      * @description This function will call the API to get all posts of the user connected and of the current page
@@ -105,14 +105,15 @@ export default {
    */
   created() {
     this.checkIfUserIsConnected()
+    this.getUserInfos()
     this.getProfilePosts()
   }
 }
 </script>
 
 <style module lang="scss">
-.profile{
-  &__container{
+.profile {
+  &__container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -120,15 +121,15 @@ export default {
     margin: auto;
     padding-bottom: 20px;
   }
-  &__picture{
+  &__picture {
     height: 150px;
     width: 150px;
     margin: 10px 0;
   }
-  &__fullname{
+  &__fullname {
     font-size: 1.6rem;
   }
-  &__about{
+  &__about {
     width: 80%;
     max-width: 350px;
     margin: 5px 0;
@@ -136,24 +137,24 @@ export default {
     border-radius: 4px;
     color: black;
     background-color: white;
-    &__title{
+    &__title {
       font-size: 1rem;
       font-weight: bold;
     }
   }
-  &__buttons{
+  &__buttons {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     width: 80%;
     max-width: 350px;
-    & button{
+    & button {
       margin-top: 5px;
     }
   }
-  &__posts{
+  &__posts {
     width: 100%;
-    &__title{
+    &__title {
       width: 100%;
       margin-top: 20px;
       padding-left: 5px;
@@ -168,13 +169,13 @@ export default {
 }
 
 @media (min-width: 480px) {
-  .profile__container{
+  .profile__container {
     width: 60%;
   }
 }
 
 @media (min-width: 1024px) {
-  .profile__container{
+  .profile__container {
     width: 40%;
   }
 }

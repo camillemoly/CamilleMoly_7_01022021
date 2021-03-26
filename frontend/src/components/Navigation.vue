@@ -1,13 +1,15 @@
 <template>
   <nav :class="$style.nav">
     <div :class="$style.nav__left">
-      <router-link to="/?page=1"><img :class="$style.nav__left__logo" src="../assets/cut-logo.png"></router-link>
-      <input :class="$style.nav__left__search" placeholder="Rechercher...">
+      <router-link to="/?page=1">
+        <img :class="$style.nav__left__logo" src="../assets/cut-logo.png" alt="logo groupomania lien vers page d'accueil">
+      </router-link>
+      <input :class="$style.nav__left__search" placeholder="Rechercher..." name="barre de recherche">
     </div>
     <div :class="$style.nav__profile">
       <router-link to="/profile?page=1">
         <div :class="$style.nav__profile__container" class="img-container-rounded">
-          <img :src="userConnected.profilePicture" class="img-cover">
+          <img :src="userConnected.profilePicture" class="img-cover" alt="ma photo de profil lien vers ma page de profil">
         </div>
       </router-link>
     </div>
@@ -26,22 +28,22 @@ export default {
 </script>
 
 <style module lang="scss">
-.nav{
+.nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 80px;
   width: 100%;
   padding: 0 20px;
-  &__left{
+  &__left {
     display: flex;
     align-items: center;
     width: 75%;
-    &__logo{
+    &__logo {
       height: 50px;
       margin-right: 10px;
     }
-    &__search{
+    &__search {
       width: 85%;
       max-width: 250px;
       border-radius: 4px;
@@ -49,12 +51,12 @@ export default {
       outline: none;
     }
   }    
-  &__profile{
+  &__profile {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     width: 15%;
-    &__container{
+    &__container {
       height: 50px;
       width: 50px;
     }
@@ -62,15 +64,15 @@ export default {
 }
 
 @media (min-width: 480px) {
-  .nav{
+  .nav {
     padding: 0 40px;
-    &__left{
-      &__logo{
+    &__left {
+      &__logo {
         height: 60px;
       }
     }
-    &__profile{
-      &__container{
+    &__profile {
+      &__container {
         height: 60px;
         width: 60px;
       }

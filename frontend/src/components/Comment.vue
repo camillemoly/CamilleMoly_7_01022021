@@ -4,7 +4,7 @@
     <!-- Setting button -->
     <div v-if="commentUserId == loggedInUserId || userConnected.isAdmin == true" :class="$style.comment__settings" class="dropright">
       <button class="btn-primary " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-ellipsis-h"></i>
+        <i class="fas fa-ellipsis-h" title="ouvrir les paramètres"></i>
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a @click="commentIsEditing = true" :class="$style.comment__settings__edit" class="dropdown-item">Modifier</a>
@@ -15,11 +15,9 @@
     <!-- User profile picture, fullname -->
     <div :class="$style.comment__user">
       <div :class="$style.comment__user__picture" class="img-container-rounded">
-        <img :src="commentUser.profile_picture" class="img-cover" />
+        <img :src="commentUser.profile_picture" :alt="'photo de profil de ' + [[ commentUser.first_name ]] + ' ' + [[ commentUser.last_name ]]" class="img-cover"/>
       </div>
-      <p :class="$style.comment__user__name">
-        {{ commentUser.first_name }} {{ commentUser.last_name }}
-      </p>
+      <p :class="$style.comment__user__name">{{ commentUser.first_name }} {{ commentUser.last_name }}</p>
     </div>
 
     <!-- Content when the comment is not editing -->
@@ -132,7 +130,7 @@ export default {
     position: absolute;
     top: 5px;
     right: 5px;
-    &__edit, &__delete{
+    &__edit, &__delete {
       cursor: pointer;
     }
   }

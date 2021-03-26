@@ -5,9 +5,9 @@
       <div :class="$style.publication">
         <div :class="$style.publication__user">
           <div :class="$style.publication__user__picture" class="img-container-rounded">
-            <img :src="userConnected.profilePicture" class="img-cover">
+            <img :src="userConnected.profilePicture" alt="ma photo de profil" class="img-cover">
           </div>
-          <textarea id="post_content" :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ userConnected.firstName ]] + ', que voulez-vous dire ?'"></textarea>
+          <textarea id="post_content" :class="$style.publication__user__input" :placeholder="'Bonjour ' + [[ userConnected.firstName ]] + ', que voulez-vous dire ?'" name="publication"></textarea>
         </div>
         <div :class="$style.publication__buttons">
           <input type="file" id="postPicture" name="postPicture" accept="image/png, image/jpeg, image/jpg, image/gif" :class="$style.publication__buttons__upload">
