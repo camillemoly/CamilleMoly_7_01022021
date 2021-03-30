@@ -13,8 +13,7 @@ export default new Vuex.Store({
       profilePicture: "",
       about: "",
       isAdmin: ""
-    },
-    info: null
+    }
   },
   getters: {
     fullName: (state) => {
