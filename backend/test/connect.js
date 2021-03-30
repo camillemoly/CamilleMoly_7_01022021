@@ -10,17 +10,17 @@ describe("connect.js", () => {
   /************************************************** SIGNUP **************************************************/
   describe("POST /api/auth/signup", () => {
     // 1
-    it.skip("should create a new user account", (done) => {
+    it("should create a new user account", (done) => {
       chai
       .request(app)
       .post("/api/auth/signup")
       .set("Content-Type", "application/json")
       .send({
         // change infos at each test or delete the user already created
-        first_name: "Tony",
-        last_name: "Stark",
-        email: "tony@test.com",
-        password: "Tony2021!",
+        first_name: "Steve",
+        last_name: "Rogers",
+        email: "steve@test.com",
+        password: "Steve2021!",
       })
       .end((err, res) => {
         res.should.have.status(201);

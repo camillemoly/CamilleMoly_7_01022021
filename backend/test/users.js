@@ -268,11 +268,11 @@ describe("users.js", () => {
   /************************************************** DELETE USER **************************************************/
   describe("DELETE /api/users/:id", () => {
     // 1
-    it.skip("should delete an user", (done) => {
+    it("should delete an user", (done) => {
       chai
       // add a id of user account existing before starting the test
       .request(app)
-      .delete("/api/users/57")
+      .delete("/api/users/127")
       .set("authorization", `Bearer ${adminToken}`)
       .end((err, res) => {
         res.should.have.status(200);

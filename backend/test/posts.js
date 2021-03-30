@@ -245,10 +245,10 @@ describe("posts.js", () => {
   /************************************************** DELETE POST **************************************************/
   describe("DELETE /api/posts/:id", () => {
     // 1
-    it.skip("should delete a post", (done) => {
+    it("should delete a post", (done) => {
       chai
       .request(app)
-      .delete("/api/posts/36")
+      .delete("/api/posts/55")
       .set("authorization", `Bearer ${adminToken}`)
       .end((err, res) => {
         res.should.have.status(200);
@@ -399,10 +399,10 @@ describe("posts.js", () => {
   /************************************************** UNLIKE POST **************************************************/
   describe("DELETE /api/posts/:id/likes", () => {
     // 1
-    it.skip("should delete the like of the post", (done) => {
+    it("should delete the like of the post", (done) => {
       chai
       .request(app)
-      .delete("/api/posts/39/likes")
+      .delete("/api/posts/54/likes")
       .set("authorization", `Bearer ${adminToken}`)
       .set("Content-Type", "application/json")
       .send({ user_id: 56 })
@@ -663,10 +663,10 @@ describe("posts.js", () => {
   /************************************************** DELETE COMMENT POST **************************************************/
   describe("DELETE /api/posts/:id/comments/:id", () => {
     // 1
-    it.skip("should delete a comment", (done) => {
+    it("should delete a comment", (done) => {
       chai
       .request(app)
-      .delete("/api/posts/39/comments/31")
+      .delete("/api/posts/54/comments/72")
       .set("authorization", `Bearer ${adminToken}`)
       .end((err, res) => {
         res.should.have.status(200);
