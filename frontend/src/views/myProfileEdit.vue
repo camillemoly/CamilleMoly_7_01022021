@@ -104,6 +104,7 @@ export default {
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
    * It checks if the user is connected and if not, redirects him to the login page
+   * It gets the connected user's infos
    */
   created() {
     this.checkIfUserIsConnected()

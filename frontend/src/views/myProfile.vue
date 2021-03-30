@@ -101,7 +101,8 @@ export default {
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
    * It checks if the user is connected and if not, redirects him to the login page
-   * and calls the getProfilePosts function to retrieve all the posts of the user and displays them
+   * It gets the connected user's infos
+   * It calls the getProfilePosts function to retrieve all the posts of the user and displays them
    */
   created() {
     this.checkIfUserIsConnected()
