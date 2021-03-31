@@ -55,6 +55,7 @@ export default new Vuex.Store({
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       })
+
       .then(user => { 
         context.commit("EDIT_FIRST_NAME", user.data.first_name)
         context.commit("EDIT_LAST_NAME", user.data.last_name)
@@ -62,7 +63,12 @@ export default new Vuex.Store({
         context.commit("EDIT_ABOUT", user.data.about)
         context.commit("EDIT_IS_ADMIN", user.data.is_admin)
       })
-      .catch(error => { console.log(error.response.data.error) });
+      
+      .catch(error => { 
+        console.log(error.response.data.error)
+        localStorage.clear()
+        router.push({ name: "Login" })
+      });
     },
 
     /**
