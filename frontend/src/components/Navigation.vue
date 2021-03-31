@@ -4,7 +4,10 @@
       <router-link to="/?page=1">
         <img :class="$style.nav__left__logo" src="../assets/cut-logo.png" alt="logo groupomania lien vers page d'accueil">
       </router-link>
-      <input :class="$style.nav__left__search" placeholder="Rechercher..." name="barre de recherche">
+      <div :class="$style.nav__left__search">
+        <input :class="$style.nav__left__search__input" placeholder="Rechercher..." name="barre de recherche">
+        <i :class="$style.nav__left__search__icon" class="fas fa-search"></i>
+      </div>
     </div>
     <div :class="$style.nav__profile">
       <router-link to="/profile?page=1">
@@ -44,11 +47,22 @@ export default {
       margin-right: 10px;
     }
     &__search {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       width: 85%;
       max-width: 250px;
+      padding-right: 10px;
       border-radius: 4px;
-      border: none;
-      outline: none;
+      background-color: white;
+      &__input {
+        width: 90%;
+        border-radius: 4px;
+        border: none;
+      }
+      &__icon {
+        color: black;
+      }
     }
   }    
   &__profile {
