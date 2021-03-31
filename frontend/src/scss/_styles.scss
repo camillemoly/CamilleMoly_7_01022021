@@ -55,8 +55,21 @@ input:focus, textarea:focus {
   outline: none;
   cursor: pointer;
   color: white;
-  background: #1dc7c1;
+  background: $color-quaternary;
   &:hover {
-    background-color: darken(#1dc7c1, 5%);
+    background-color: darken($color-quaternary, 5%);
   }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border: 8px solid $color-primary;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: $color-secondary;
 }
