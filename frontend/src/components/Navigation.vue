@@ -1,7 +1,7 @@
 <template>
   <nav :class="$style.nav">
     <div :class="$style.nav__left">
-      <router-link to="/?page=1">
+      <router-link to="/">
         <img :class="$style.nav__left__logo" src="../assets/cut-logo.png" alt="logo groupomania lien vers page d'accueil">
       </router-link>
       <div :class="$style.nav__left__search">
@@ -10,7 +10,7 @@
       </div>
     </div>
     <div :class="$style.nav__profile">
-      <router-link to="/profile?page=1">
+      <router-link to="/profile">
         <div :class="$style.nav__profile__container" class="img-container-rounded">
           <img :src="userConnected.profilePicture" class="img-cover" alt="ma photo de profil lien vers ma page de profil">
         </div>

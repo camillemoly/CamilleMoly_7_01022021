@@ -76,7 +76,7 @@ export default {
       })
       .then(response => { 
         this.info = `${response.data.message}`
-        setTimeout(() => this.$router.push({ path: "/profile?page=1" }), 1000)
+        setTimeout(() => this.$router.push({ name: "MyProfile" }), 1000)
       })
       .catch(error => { if(error.response) { this.info = error.response.data.error }});
     },

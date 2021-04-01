@@ -19,7 +19,7 @@
       <h2 :class="$style.profile__posts__title">Derniers Posts</h2>
       <div :class="$style.profile__posts">
         <Post
-          v-for="post in posts"
+          v-for="post in profilePosts"
           :key="post.id"
           :postId="post.id"
           :postUserId="post.user_id"
@@ -27,16 +27,11 @@
           :content="post.content"
           :postPicture="post.post_picture"
           :getProfilePosts="getProfilePosts"
-        />
-      </div> 
-      <div :class="$style.pagination">
-        <ProfilePagination
-          v-for="index in Number(totalPages)"
-          :key="index"
-          :differentPage="index"
-          :getProfilePosts="getProfilePosts"
+          :resetProfilePosts="resetProfilePosts"
+          :profileCurrentPage="profileCurrentPage"
         />
       </div>
+      <div v-if="profilePosts.length" v-observe-visibility="handleScrolledToBottom"></div>
     </div>
   </div>
 </template>
@@ -45,22 +40,19 @@
 import axios from "axios"
 import Navigation from "../components/Navigation"
 import Post from "../components/Post"
-import ProfilePagination from "../components/ProfilePagination"
 import { mapState, mapGetters, mapActions } from "vuex"
 
 export default {
   name: "MyProfile",
   components: {
     Navigation,
-    Post,
-    ProfilePagination
+    Post
   },
   data() {
     return {
-      posts: "",
-      totalPosts: "",
-      currentPage: "",
-      totalPages: ""
+      profileCurrentPage: 0,
+      profileTotalPages: 1,
+      profilePosts: []
     }
   },
   computed: {
@@ -75,28 +67,35 @@ export default {
      *
      * @return  {Object}  Object with posts, total posts, total pages and current page
      */
-    getProfilePosts() {
-      const currentURL = new URLSearchParams(window.location.search)
-      const currentPage = (Number(currentURL.get("page")) - 1)
+    getProfilePosts(page) {
       axios({
         method: "get",
-        url: `http://localhost:3000/api/posts/all?page=${currentPage}&user_id=${localStorage.getItem("userId")}`,
+        url: `http://localhost:3000/api/posts/all?page=${page}&user_id=${localStorage.getItem("userId")}`,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       })
+
       .then(response => { 
-        this.posts = response.data.posts
-        this.totalPosts = response.data.totalPosts
-        this.totalPages = response.data.totalPages
-        this.currentPage = response.data.currentPage
-        if (this.posts == "") {
-          this.$router.push({ name: "MyProfile" })
-        }
+        this.profilePosts.push(...response.data.posts)
+        this.profileTotalPages = response.data.totalPages
       })
+
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
+
+    handleScrolledToBottom(isVisible) {
+      if (!isVisible) { return }
+      if (this.profileCurrentPage >= (this.profileTotalPages - 1)) { return }
+      this.profileCurrentPage++
+      this.getProfilePosts(this.profileCurrentPage)
+    },
+
+    resetProfilePosts() {
+      this.profilePosts = []
+      this.profileCurrentPage = 0
+    }
   },
 
   /************** WHEN THE PAGE IS CREATED (BEFORE MOUNTED) ************** /
@@ -107,7 +106,7 @@ export default {
   created() {
     this.checkIfUserIsConnected()
     this.getUserInfos()
-    this.getProfilePosts()
+    this.getProfilePosts(this.profileCurrentPage)
   }
 }
 </script>
@@ -163,10 +162,6 @@ export default {
       font-size: 1rem;
     }
   }
-}
-.pagination {
-  display: flex;
-  justify-content: center;
 }
 
 @media (min-width: 480px) {

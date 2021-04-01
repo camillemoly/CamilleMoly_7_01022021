@@ -82,7 +82,7 @@ import { mapState } from "vuex"
 
 export default {
   name: "Post",
-  props: ["postId", "postUserId", "date", "content", "postPicture", "getHomePosts", "getProfilePosts"],
+  props: ["postId", "postUserId", "date", "content", "postPicture", "getHomePosts", "resetHomePosts", "getProfilePosts", "resetProfilePosts"],
   components: {
     Comment
   },
@@ -132,9 +132,11 @@ export default {
       .then(() => {
         this.postIsEditing = false
         if (this.$route.name === "Home") {
-          this.getHomePosts()
+          this.resetHomePosts()
+          this.getHomePosts(0)
         } else if (this.$route.name === "MyProfile") {
-          this.getProfilePosts()
+          this.resetProfilePosts()
+          this.getProfilePosts(0)
         }
       })
 
@@ -157,9 +159,11 @@ export default {
 
       .then(() => {
         if (this.$route.name === "Home") {
-          this.getHomePosts()
+          this.resetHomePosts()
+          this.getHomePosts(0)
         } else if (this.$route.name === "MyProfile") {
-          this.getProfilePosts()
+          this.resetProfilePosts()
+          this.getProfilePosts(0)
         }
       })
       

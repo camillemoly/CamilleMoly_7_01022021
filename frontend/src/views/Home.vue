@@ -16,7 +16,7 @@
       </div>
       <div :class="$style.posts">
         <Post
-          v-for="post in posts"
+          v-for="post in homePosts"
           :key="post.id"
           :postId="post.id"
           :postUserId="post.user_id"
@@ -24,16 +24,11 @@
           :content="post.content"
           :postPicture="post.post_picture"
           :getHomePosts="getHomePosts"
+          :resetHomePosts="resetHomePosts"
+          :homeCurrentPage="homeCurrentPage"
         />
       </div>
-      <div :class="$style.pagination">
-        <HomePagination
-          v-for="index in Number(totalPages)"
-          :key="index"
-          :differentPage="index"
-          :getHomePosts="getHomePosts"
-        />
-      </div>
+      <div v-if="homePosts.length" v-observe-visibility="handleScrolledToBottom"></div>
     </div>
   </div>
 </template>
@@ -42,22 +37,19 @@
 import axios from "axios"
 import Navigation from "../components/Navigation"
 import Post from "../components/Post"
-import HomePagination from "../components/HomePagination"
 import { mapState, mapActions } from "vuex"
 
 export default {
   name: "Home",
   components: {
     Navigation,
-    Post,
-    HomePagination
+    Post
   },
   data(){
     return{
-      posts: "",
-      totalPosts: "",
-      currentPage: "",
-      totalPages: ""
+      homeCurrentPage: 0,
+      homeTotalPages: 1,
+      homePosts: []
     }
   },
   computed: {
@@ -71,26 +63,31 @@ export default {
      *
      * @return  {Object}  Object with posts, total posts, total pages and current page
      */
-    getHomePosts(){
-      const currentURL = new URLSearchParams(window.location.search)
-      const currentPage = (Number(currentURL.get("page")) - 1)
+    getHomePosts(page){
       axios({
       method: "get",
-      url: `http://localhost:3000/api/posts/all?page=${currentPage}`,
+      url: `http://localhost:3000/api/posts/all?page=${page}`,
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       }
       })
       .then(response => { 
-        this.posts = response.data.posts
-        this.totalPosts = response.data.totalPosts
-        this.totalPages = response.data.totalPages
-        this.currentPage = response.data.currentPage
-        if (this.posts == "") {
-          this.$router.push({ name: "Home" })
-        }
+        this.homePosts.push(...response.data.posts)
+        this.homeTotalPages = response.data.totalPages
       })
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
+    },
+
+    handleScrolledToBottom(isVisible) {
+      if (!isVisible) { return }
+      if (this.homeCurrentPage >= (this.homeTotalPages - 1)) { return }
+      this.homeCurrentPage++
+      this.getHomePosts(this.homeCurrentPage)
+    },
+
+    resetHomePosts() {
+      this.homePosts = []
+      this.homeCurrentPage = 0
     },
 
     /**
@@ -108,6 +105,7 @@ export default {
       if (document.getElementById("postPicture").value !== "") {
         formData.set("image", document.getElementById("postPicture").files[0])
       }
+
       axios({
         method: "post",
         url: `http://localhost:3000/api/posts`,
@@ -117,10 +115,13 @@ export default {
         },
         data: formData
       })
+
       .then(() => { 
-        this.getHomePosts()
+        this.resetHomePosts()
+        this.getHomePosts(0)
         document.getElementById("post_content").value = ""
       })
+
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     }
   },
@@ -133,7 +134,7 @@ export default {
   created() {
     this.checkIfUserIsConnected()
     this.getUserInfos()
-    this.getHomePosts()
+    this.getHomePosts(this.homeCurrentPage)
   }
 }
 </script>
@@ -179,10 +180,6 @@ export default {
 .posts{
   width: 100%;
   margin: 10px auto;
-}
-.pagination {
-  display: flex;
-  justify-content: center;
 }
 
 @media (min-width: 480px) {

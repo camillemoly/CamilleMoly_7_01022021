@@ -48,7 +48,7 @@ export default {
         this.info = `${response.data.message} Redirection vers la page d'accueil...`
         localStorage.setItem("userId", response.data.user_id)
         localStorage.setItem("token", response.data.token)
-        setTimeout(() => this.$router.push({ path: "/", query: { page: 1 } } ), 1500)
+        setTimeout(() => this.$router.push({ name: "Home" }), 1500)
       })
       .catch(error => { if(error.response) { this.info = error.response.data.error }});
     }
