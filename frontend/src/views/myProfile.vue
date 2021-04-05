@@ -85,6 +85,14 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
+    /**
+     * @description This function will increment the profileCurrentPage
+     * and will call the getProfilePosts to update the posts feed
+     *
+     * @param   {Boolean}  isVisible  If the div is visible (when profilePosts.length)
+     *
+     * @return  {Function}            Can return increment of profileCurrentPage and update posts feed
+     */
     handleScrolledToBottom(isVisible) {
       if (!isVisible) { return }
       if (this.profileCurrentPage >= (this.profileTotalPages - 1)) { return }
@@ -92,6 +100,11 @@ export default {
       this.getProfilePosts(this.profileCurrentPage)
     },
 
+    /**
+     * @description This function will empty the profilePosts and set the profileCurrentPage to 0
+     *
+     * @return  {Function}  Empty the profilePosts and set profileCurrentPage to 0
+     */
     resetProfilePosts() {
       this.profilePosts = []
       this.profileCurrentPage = 0

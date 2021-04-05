@@ -107,7 +107,7 @@ export default {
     /**
      * @description This function will call the API to update the post
      *
-     * @return  {Function}  Passes the postIsEditing to false, and call a function update the posts feed
+     * @return  {Function}  Passes the postIsEditing to false, resets the posts array and calls a function update the posts feed
      */
     updatePost() {
       const formData = new FormData()
@@ -146,7 +146,7 @@ export default {
     /**
      * @description This function will call the API to delete the post
      *
-     * @return  {Function}  Call a function to update the posts feed
+     * @return  {Function}  Resets the posts array and calls a function to update the posts feed
      */
     deletePost() {
       axios({

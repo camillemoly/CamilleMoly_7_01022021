@@ -78,6 +78,14 @@ export default {
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
     },
 
+    /**
+     * @description This function will increment the homeCurrentPage
+     * and will call the getHomePosts to update the posts feed
+     *
+     * @param   {Boolean}  isVisible  If the div is visible (when homePosts.length)
+     *
+     * @return  {Function}            Can return increment of homeCurrentPage and update posts feed
+     */
     handleScrolledToBottom(isVisible) {
       if (!isVisible) { return }
       if (this.homeCurrentPage >= (this.homeTotalPages - 1)) { return }
@@ -85,6 +93,11 @@ export default {
       this.getHomePosts(this.homeCurrentPage)
     },
 
+    /**
+     * @description This function will empty the homePosts and set the homeCurrentPage to 0
+     *
+     * @return  {Function}  Empty the homePosts and set homeCurrentPage to 0
+     */
     resetHomePosts() {
       this.homePosts = []
       this.homeCurrentPage = 0
@@ -93,7 +106,7 @@ export default {
     /**
      * @description This function will call the API to create a new post 
      *
-     * @return  {Function}  Function to update the posts feed
+     * @return  {Function}  Function to reset the homePosts then update the posts feed
      */
     createPost(){
       const formData = new FormData()
