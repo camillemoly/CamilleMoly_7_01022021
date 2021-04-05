@@ -63,6 +63,7 @@
         :content="comment.content"
         :getAllCommentsOfAPost="getAllCommentsOfAPost"
         :loggedInUserId="loggedInUserId"
+        :resetComments="resetComments"
       />
     </div>
 
@@ -287,6 +288,15 @@ export default {
     },
 
     /**
+     * @description This function will reset the comments data
+     *
+     * @return  {String}  Empty this.comment
+     */
+    resetComments() {
+      this.comments = ""
+    },
+
+    /**
      * @description This function will call the API to comment a post (create a comment)
      *
      * @return  {Function}  Calls getAllCommentsOfAPost function to update comments feed
@@ -304,7 +314,8 @@ export default {
           content: document.getElementById(`commentInput` + this.postId).value
         }
       })
-      .then(() => { 
+      .then(() => {
+        this.resetComments()
         this.getAllCommentsOfAPost()
         document.getElementById(`commentInput` + this.postId).value = ""
       })

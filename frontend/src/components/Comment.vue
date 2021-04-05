@@ -36,7 +36,7 @@ import { mapState } from "vuex"
 
 export default {
   name: "Comment",
-  props: ["loggedInUserId", "commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost"],
+  props: ["loggedInUserId", "commentId", "commentUserId", "commentPostId", "content", "getAllCommentsOfAPost", "resetComments"],
   data() {
     return {
       commentUser: "",
@@ -68,6 +68,7 @@ export default {
 
       .then(() => {
         this.commentIsEditing = false
+        this.resetComments()
         this.getAllCommentsOfAPost()
       })
 
@@ -90,6 +91,7 @@ export default {
       })
 
       .then(() => {
+        this.resetComments()
         this.getAllCommentsOfAPost()
       })
 
