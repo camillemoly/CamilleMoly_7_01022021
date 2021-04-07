@@ -92,7 +92,7 @@ export default {
       loggedInUserId: localStorage.getItem("userId"),
       postUser: "",
       likes: "",
-      comments: "",
+      comments: [],
       postIsEditing: false,
       postIsLiked: false,
       showComments: false
@@ -281,7 +281,9 @@ export default {
       })
 
       .then(response => {
-        this.comments = response.data
+        for (let i in response.data) {
+          this.comments.push(response.data[i])
+        }
       })
 
       .catch(error => { if(error.response) { console.log(error.response.data.error) }});
@@ -293,7 +295,7 @@ export default {
      * @return  {String}  Empty this.comment
      */
     resetComments() {
-      this.comments = ""
+      this.comments = []
     },
 
     /**
